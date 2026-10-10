@@ -1,6 +1,6 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1020 580" font-family="ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, sans-serif" role="img" aria-labelledby="t d">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1250 612" font-family="ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, sans-serif" role="img" aria-labelledby="t d">
   <title id="t">Rubrica: architecture</title>
-  <desc id="d">Discovery tools probe the original service and record traces; traces become the spec and the regression corpus; the deployed replica is a raw HTTP adapter over a pure decision core; a harness diffs the replica against the corpus and a canary watches the original for drift.</desc>
+  <desc id="d">System 2 (a person and a model, offline) sends gated probes to the original service, records every response in the experiment log, and turns evidence into candidate rules. Approved rules go into the service ontology, the shared memory. The ontology compiles into the rule table that System 1, the deployed replica, executes, and it generates the spec and the tests. A verification harness replays the tests against the replica, and a drift canary watches the original service.</desc>
   <style>
     :root { --bg:#ffffff; --fg:#14161a; --muted:#5b6370; --line:#9aa3af; --box:#f4f6f9; --stroke:#c9d0da; --accent:#0b6bcb; --accentbg:#e8f1fb; --warn:#b35c00; --warnbg:#fdf1e4; }
     @media (prefers-color-scheme: dark) {
@@ -11,85 +11,110 @@
     .glabel { fill: var(--muted); font-size: 12px; font-weight: 700; letter-spacing: .08em; }
     .box { fill: var(--box); stroke: var(--stroke); stroke-width: 1.2; }
     .core { fill: var(--accentbg); stroke: var(--accent); stroke-width: 1.5; }
+    .onto { fill: var(--accentbg); stroke: var(--accent); stroke-width: 2.5; }
     .ext { fill: var(--warnbg); stroke: var(--warn); stroke-width: 1.5; }
     .h { fill: var(--fg); font-size: 14px; font-weight: 650; }
+    .hl { fill: var(--fg); font-size: 16px; font-weight: 700; }
     .s { fill: var(--muted); font-size: 12px; }
+    .xs { fill: var(--muted); font-size: 11px; }
+    .em { fill: var(--fg); font-size: 12px; font-weight: 650; }
     .mono { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; }
     .edge { fill: none; stroke: var(--line); stroke-width: 1.5; }
-    .edge.hot { stroke: var(--accent); }
+    .edge.hot { stroke: var(--accent); stroke-width: 2; }
     .elabel { fill: var(--muted); font-size: 11px; font-style: italic; }
+    .cap { fill: var(--muted); font-size: 13px; }
+    .capb { fill: var(--fg); font-weight: 700; }
     .arrow { fill: var(--line); }
     .arrow.hot { fill: var(--accent); }
   </style>
   <defs>
     <marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="arrow" d="M0,0 L10,5 L0,10 z"/></marker>
-    <marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="arrow hot" d="M0,0 L10,5 L0,10 z"/></marker>
+    <marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path class="arrow hot" d="M0,0 L10,5 L0,10 z"/></marker>
   </defs>
-  <rect class="bg" width="1020" height="580"/>
+  <rect class="bg" width="1250" height="612"/>
+  <g transform="translate(5,10)">
 
   <!-- External systems -->
-  <rect class="ext" x="390" y="18" width="220" height="62" rx="8"/>
-  <text class="h" x="500" y="44" text-anchor="middle">Original service</text>
-  <text class="s" x="500" y="63" text-anchor="middle">POST /msg · {"m":"CMD;args;ctrl"}</text>
+  <rect class="ext" x="463" y="12" width="260" height="74" rx="8"/>
+  <text class="h" x="593" y="34" text-anchor="middle">Original service</text>
+  <text class="s mono" x="593" y="53" text-anchor="middle">POST /msg · CMD;args;control</text>
+  <text class="s" x="593" y="72" text-anchor="middle">changes during the day</text>
 
-  <rect class="ext" x="720" y="18" width="270" height="62" rx="8"/>
-  <text class="h" x="855" y="44" text-anchor="middle">Evaluator · hidden test set</text>
-  <text class="s" x="855" y="63" text-anchor="middle">POST /__reset, then a sequence</text>
+  <rect class="ext" x="790" y="12" width="280" height="74" rx="8"/>
+  <text class="h" x="930" y="34" text-anchor="middle">Evaluator · hidden test set</text>
+  <text class="s" x="930" y="53" text-anchor="middle">100 tests · 20:00 version</text>
+  <text class="s" x="930" y="72" text-anchor="middle">POST /__reset, then a sequence</text>
 
-  <!-- Discovery group -->
+  <!-- System 2 group -->
   <rect class="group" x="20" y="118" width="430" height="262" rx="10"/>
-  <text class="glabel" x="36" y="374">AGENT HARNESS (SYSTEM 2) · LOCAL</text>
+  <text class="glabel" x="36" y="374">SYSTEM 2 · DISCOVERY · OFFLINE</text>
 
   <rect class="box" x="40" y="155" width="180" height="56" rx="7"/>
-  <text class="h" x="130" y="179" text-anchor="middle">Probe</text>
-  <text class="s mono" x="130" y="198" text-anchor="middle">predict → budget gate</text>
+  <text class="h" x="130" y="179" text-anchor="middle">Probe gate</text>
+  <text class="s" x="130" y="198" text-anchor="middle">no prediction, no request</text>
 
-  <rect class="box" x="40" y="225" width="180" height="56" rx="7"/>
-  <text class="h" x="130" y="249" text-anchor="middle">Stateful fuzzer</text>
-  <text class="s" x="130" y="268" text-anchor="middle">targeted op sequences</text>
+  <rect class="box" x="40" y="230" width="180" height="56" rx="7"/>
+  <text class="h" x="130" y="254" text-anchor="middle">Stateful fuzzer</text>
+  <text class="s" x="130" y="273" text-anchor="middle">low-confidence rules first</text>
 
   <rect class="box" x="40" y="305" width="180" height="56" rx="7"/>
   <text class="h" x="130" y="329" text-anchor="middle">Shrinker</text>
   <text class="s" x="130" y="348" text-anchor="middle">divergence → minimal case</text>
 
   <rect class="box" x="250" y="155" width="180" height="56" rx="7"/>
-  <text class="h" x="340" y="179" text-anchor="middle">Trace store</text>
+  <text class="h" x="340" y="179" text-anchor="middle">Experiment log</text>
   <text class="s mono" x="340" y="198" text-anchor="middle">experimentos.jsonl</text>
 
+  <rect class="box" x="250" y="230" width="180" height="56" rx="7"/>
+  <text class="h" x="340" y="254" text-anchor="middle">Person + model</text>
+  <text class="s" x="340" y="273" text-anchor="middle">read evidence · propose</text>
+
   <rect class="box" x="250" y="305" width="180" height="56" rx="7"/>
-  <text class="h" x="340" y="329" text-anchor="middle">Spec + experiment log</text>
-  <text class="s" x="340" y="348" text-anchor="middle">each rule cites its traces</text>
+  <text class="h" x="340" y="329" text-anchor="middle">Candidate rules</text>
+  <text class="s" x="340" y="348" text-anchor="middle">hypothesis search</text>
 
-  <!-- Replica group -->
-  <rect class="group" x="550" y="118" width="440" height="262" rx="10"/>
-  <text class="glabel" x="566" y="374">REPLICA (SYSTEM 1) · DEPLOYED · ONE PROCESS</text>
+  <!-- Ontology: the bridge between System 2 and System 1 -->
+  <text class="glabel" x="593" y="146" text-anchor="middle">SHARED MEMORY</text>
+  <rect class="onto" x="478" y="155" width="230" height="206" rx="9"/>
+  <text class="hl" x="593" y="181" text-anchor="middle">Service ontology</text>
+  <text class="s" x="593" y="199" text-anchor="middle">approved rules · v1 → v2</text>
+  <text class="xs mono" x="593" y="226" text-anchor="middle">Rule{command, when, then,</text>
+  <text class="xs mono" x="593" y="242" text-anchor="middle">effect, evidence, confianza}</text>
+  <text class="xs mono" x="593" y="265" text-anchor="middle">Checksum{scope, mapping,</text>
+  <text class="xs mono" x="593" y="281" text-anchor="middle">base, modulus, transform}</text>
+  <text class="s" x="593" y="312" text-anchor="middle">one source, three jobs:</text>
+  <text class="em" x="593" y="332" text-anchor="middle">executes · SPEC.md · tests</text>
 
-  <rect class="box" x="570" y="155" width="180" height="56" rx="7"/>
-  <text class="h" x="660" y="179" text-anchor="middle">Raw HTTP adapter</text>
-  <text class="s" x="660" y="198" text-anchor="middle">auth · exact bodies · unknown routes</text>
+  <!-- System 1 group -->
+  <rect class="group" x="760" y="118" width="460" height="262" rx="10"/>
+  <text class="glabel" x="1204" y="374" text-anchor="end">SYSTEM 1 · REPLICA · ONE PROCESS</text>
 
-  <rect class="box" x="570" y="230" width="180" height="56" rx="7"/>
-  <text class="h" x="660" y="254" text-anchor="middle">Serial queue</text>
-  <text class="s" x="660" y="273" text-anchor="middle">actor model · one at a time</text>
+  <rect class="box" x="780" y="155" width="200" height="56" rx="7"/>
+  <text class="h" x="880" y="179" text-anchor="middle">Raw HTTP adapter</text>
+  <text class="s" x="880" y="198" text-anchor="middle">token auth · exact bodies</text>
 
-  <rect class="box" x="570" y="305" width="180" height="56" rx="7"/>
-  <text class="h" x="660" y="329" text-anchor="middle">Service ontology</text>
-  <text class="s" x="660" y="348" text-anchor="middle">typed rules + evidence · v1, v2</text>
+  <rect class="box" x="780" y="230" width="200" height="56" rx="7"/>
+  <text class="h" x="880" y="254" text-anchor="middle">Serial queue</text>
+  <text class="s" x="880" y="273" text-anchor="middle">actor model · one at a time</text>
 
-  <rect class="core" x="780" y="155" width="190" height="131" rx="7"/>
-  <text class="h" x="875" y="178" text-anchor="middle">Decision core</text>
-  <text class="s mono" x="875" y="196" text-anchor="middle">handle(state[token], msg)</text>
-  <text class="s mono" x="875" y="211" text-anchor="middle">→ (state, resp)</text>
-  <text class="s" x="875" y="234" text-anchor="middle">route → auth → parse</text>
-  <text class="s" x="875" y="251" text-anchor="middle">→ control → command → arity</text>
-  <text class="s" x="875" y="268" text-anchor="middle">→ lookup → business rule → effect</text>
+  <rect class="box" x="780" y="305" width="200" height="56" rx="7"/>
+  <text class="h" x="880" y="329" text-anchor="middle">Compiled rule table</text>
+  <text class="s" x="880" y="348" text-anchor="middle">no LLM at runtime</text>
 
-  <rect class="box" x="780" y="305" width="190" height="56" rx="7"/>
-  <text class="h" x="875" y="329" text-anchor="middle">In-memory state</text>
-  <text class="s mono" x="875" y="348" text-anchor="middle">/__reset · /health</text>
+  <rect class="core" x="1005" y="155" width="195" height="131" rx="7"/>
+  <text class="h" x="1102" y="178" text-anchor="middle">Decision core</text>
+  <text class="s mono" x="1102" y="196" text-anchor="middle">handle(state[token], msg)</text>
+  <text class="s mono" x="1102" y="211" text-anchor="middle">→ (state, resp)</text>
+  <text class="s" x="1102" y="234" text-anchor="middle">route → auth → parse</text>
+  <text class="s" x="1102" y="251" text-anchor="middle">→ control → cmd → arity</text>
+  <text class="s" x="1102" y="268" text-anchor="middle">→ lookup → rule → effect</text>
 
-  <!-- Harness group -->
-  <rect class="group" x="20" y="410" width="970" height="150" rx="10"/>
+  <rect class="box" x="1005" y="305" width="195" height="56" rx="7"/>
+  <text class="h" x="1102" y="329" text-anchor="middle">In-memory state</text>
+  <text class="xs" x="1102" y="348" text-anchor="middle">per token · /__reset · /health</text>
+
+  <!-- Verification harness -->
+  <rect class="group" x="20" y="410" width="1200" height="150" rx="10"/>
   <text class="glabel" x="36" y="432">VERIFICATION HARNESS</text>
 
   <rect class="box" x="40" y="450" width="380" height="88" rx="7"/>
@@ -97,35 +122,47 @@
   <text class="s" x="230" y="497" text-anchor="middle">corpus = train · held-out fuzz = test (M1)</text>
   <text class="s" x="230" y="516" text-anchor="middle">canary = eval still true? · hidden set = final test</text>
 
-  <rect class="core" x="570" y="450" width="180" height="88" rx="7"/>
-  <text class="h" x="660" y="476" text-anchor="middle">Differential diff</text>
-  <text class="s" x="660" y="497" text-anchor="middle">replay corpus vs replica</text>
-  <text class="s" x="660" y="516" text-anchor="middle">status · exact body</text>
+  <rect class="core" x="780" y="450" width="200" height="88" rx="7"/>
+  <text class="h" x="880" y="476" text-anchor="middle">Differential test</text>
+  <text class="s" x="880" y="497" text-anchor="middle">replay tests vs replica</text>
+  <text class="s" x="880" y="516" text-anchor="middle">status · JSON body</text>
 
-  <rect class="core" x="780" y="450" width="190" height="88" rx="7"/>
-  <text class="h" x="875" y="476" text-anchor="middle">Drift canary</text>
-  <text class="s" x="875" y="497" text-anchor="middle">10-req canary every 10 min (M3)</text>
-  <text class="s" x="875" y="516" text-anchor="middle">diff → alert → re-probe (480 req)</text>
+  <rect class="core" x="1005" y="450" width="195" height="88" rx="7"/>
+  <text class="h" x="1102" y="476" text-anchor="middle">Drift canary</text>
+  <text class="s" x="1102" y="497" text-anchor="middle">10 requests every 10 min</text>
+  <text class="s" x="1102" y="516" text-anchor="middle">diff → triage → re-probe</text>
 
-  <!-- Edges -->
-  <path class="edge" d="M130,155 V49 H388" marker-end="url(#a)"/>
-  <text class="elabel" x="140" y="42">recorded requests</text>
-  <path class="edge" d="M500,80 V100 H340 V153" marker-end="url(#a)"/>
-  <text class="elabel" x="350" y="96">responses</text>
-  <path class="edge" d="M130,211 V223" marker-end="url(#a)"/>
-  <path class="edge" d="M130,281 V303" marker-end="url(#a)"/>
-  <path class="edge" d="M220,253 H250 V213" marker-end="url(#a)"/>
-  <path class="edge" d="M340,211 V303" marker-end="url(#a)"/>
-  <path class="edge hot" d="M430,333 H568" marker-end="url(#ah)"/>
-  <text class="elabel" x="458" y="325">compiles into</text>
-  <path class="edge" d="M855,80 V104 H660 V153" marker-end="url(#a)"/>
-  <path class="edge" d="M660,211 V228" marker-end="url(#a)"/>
-  <path class="edge" d="M750,258 H778" marker-end="url(#a)"/>
-  <path class="edge" d="M750,333 H875 V288" marker-end="url(#a)"/>
-  <path class="edge" d="M875,286 V303" marker-end="url(#a)"/>
-  <path class="edge" d="M430,183 H480 V494 H568" marker-end="url(#a)"/>
-  <text class="elabel" x="488" y="400">corpus</text>
-  <path class="edge hot" d="M570,480 H540 V183 H568" marker-end="url(#ah)"/>
-  <path class="edge" d="M568,515 H422" marker-end="url(#a)"/>
-  <path class="edge hot" d="M970,494 H1004 V92 H585 V82" marker-end="url(#ah)"/>
+  <!-- Edges: System 2 -->
+  <path class="edge" d="M130,155 V49 H461" marker-end="url(#a)"/>
+  <text class="elabel" x="140" y="42">gated requests · ≤ 8,000/day</text>
+  <path class="edge" d="M560,86 V100 H340 V153" marker-end="url(#a)"/>
+  <text class="elabel" x="350" y="95">responses</text>
+  <path class="edge" d="M130,230 V213" marker-end="url(#a)"/>
+  <path class="edge" d="M220,345 H248" marker-end="url(#a)"/>
+  <path class="edge" d="M250,320 H235 V198 H222" marker-end="url(#a)"/>
+  <path class="edge" d="M340,211 V228" marker-end="url(#a)"/>
+  <path class="edge" d="M340,286 V303" marker-end="url(#a)"/>
+  <path class="edge hot" d="M430,333 H476" marker-end="url(#ah)"/>
+
+  <!-- Edges: ontology to System 1 and to the harness -->
+  <path class="edge hot" d="M593,361 V395 H830 V363" marker-end="url(#ah)"/>
+  <text class="elabel" x="640" y="390">compiles into</text>
+  <path class="edge" d="M540,361 V494 H778" marker-end="url(#a)"/>
+  <text class="elabel" x="548" y="455">tests + corpus</text>
+
+  <!-- Edges: System 1 -->
+  <path class="edge" d="M880,86 V153" marker-end="url(#a)"/>
+  <path class="edge" d="M880,211 V228" marker-end="url(#a)"/>
+  <path class="edge" d="M980,258 H1003" marker-end="url(#a)"/>
+  <path class="edge" d="M980,322 L1003,290" marker-end="url(#a)"/>
+  <path class="edge" d="M1102,286 V303" marker-end="url(#a)"/>
+
+  <!-- Edges: harness -->
+  <path class="edge hot" d="M900,450 V382" marker-end="url(#ah)"/>
+  <path class="edge" d="M778,515 H422" marker-end="url(#a)"/>
+  <path class="edge hot" d="M1200,494 H1232 V4 H650 V10" marker-end="url(#ah)"/>
+
+  <!-- Caption -->
+  <text class="cap" x="620" y="586" text-anchor="middle"><tspan class="capb">Rubrica</tspan> · System 2 discovers → the ontology remembers → System 1 executes · the original service is the exact judge</text>
+  </g>
 </svg>
