@@ -1,6 +1,6 @@
-# La caja negra: Systems Design
+# Rubrica: Systems Design
 
-**Kevin Vicent · Reto 2 · v4**
+**Learning a black box, one proven rule at a time** · Reto 2 · La caja negra · rubrica.dev · Kevin Vicent · v4
 
 > **Thesis:** The black box is an unknown decision procedure. We find its rules with experiments. We prove each rule against the real service. Then we compile the rules into a deterministic replica. Most agent systems need an LLM judge. Our system has an exact judge: the original service.
 

@@ -1,5 +1,5 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1020 580" font-family="ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, sans-serif" role="img" aria-labelledby="t d">
-  <title id="t">La caja negra: architecture</title>
+  <title id="t">Rubrica: architecture</title>
   <desc id="d">Discovery tools probe the original service and record traces; traces become the spec and the regression corpus; the deployed replica is a raw HTTP adapter over a pure decision core; a harness diffs the replica against the corpus and a canary watches the original for drift.</desc>
   <style>
     :root { --bg:#ffffff; --fg:#14161a; --muted:#5b6370; --line:#9aa3af; --box:#f4f6f9; --stroke:#c9d0da; --accent:#0b6bcb; --accentbg:#e8f1fb; --warn:#b35c00; --warnbg:#fdf1e4; }
