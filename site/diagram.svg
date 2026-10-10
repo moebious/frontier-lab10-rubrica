@@ -102,9 +102,10 @@
   <text class="s" x="880" y="348" text-anchor="middle">from the current version</text>
 
   <rect class="core" x="1005" y="155" width="195" height="131" rx="7"/>
-  <text class="h" x="1102" y="202" text-anchor="middle">Decision core</text>
-  <text class="s" x="1102" y="226" text-anchor="middle">first matching rule decides</text>
-  <text class="s" x="1102" y="246" text-anchor="middle">order learned from evidence</text>
+  <text class="h" x="1102" y="196" text-anchor="middle">Decision core</text>
+  <text class="s" x="1102" y="219" text-anchor="middle">first matching rule decides</text>
+  <text class="s" x="1102" y="238" text-anchor="middle">order learned from evidence</text>
+  <text class="s" x="1102" y="257" text-anchor="middle">no match → documented default</text>
 
   <rect class="box" x="1005" y="305" width="195" height="56" rx="7"/>
   <text class="h" x="1102" y="329" text-anchor="middle">In-memory state</text>
@@ -112,7 +113,7 @@
 
   <!-- Verification harness -->
   <rect class="group" x="20" y="410" width="1200" height="150" rx="10"/>
-  <text class="glabel" x="36" y="432">VERIFICATION HARNESS</text>
+  <text class="glabel" x="36" y="432">VERIFICATION</text>
 
   <rect class="box" x="40" y="450" width="380" height="88" rx="7"/>
   <text class="h" x="230" y="476" text-anchor="middle">Results</text>
