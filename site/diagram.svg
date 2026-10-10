@@ -95,12 +95,9 @@
   <text class="s" x="880" y="348" text-anchor="middle">no LLM at runtime</text>
 
   <rect class="core" x="1005" y="155" width="195" height="131" rx="7"/>
-  <text class="h" x="1102" y="178" text-anchor="middle">Decision core</text>
-  <text class="s" x="1102" y="198" text-anchor="middle">first matching rule decides</text>
-  <text class="s" x="1102" y="224" text-anchor="middle">route → auth → parse</text>
-  <text class="s" x="1102" y="240" text-anchor="middle">→ control → command</text>
-  <text class="s" x="1102" y="256" text-anchor="middle">→ arity → lookup</text>
-  <text class="s" x="1102" y="272" text-anchor="middle">→ business rule → effect</text>
+  <text class="h" x="1102" y="202" text-anchor="middle">Decision core</text>
+  <text class="s" x="1102" y="226" text-anchor="middle">first matching rule decides</text>
+  <text class="s" x="1102" y="246" text-anchor="middle">order learned from evidence</text>
 
   <rect class="box" x="1005" y="305" width="195" height="56" rx="7"/>
   <text class="h" x="1102" y="329" text-anchor="middle">In-memory state</text>
