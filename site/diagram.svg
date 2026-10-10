@@ -42,7 +42,7 @@
 
   <rect class="box" x="40" y="155" width="180" height="56" rx="7"/>
   <text class="h" x="130" y="179" text-anchor="middle">Probe</text>
-  <text class="s mono" x="130" y="198" text-anchor="middle">req.py · E1, E2, …</text>
+  <text class="s mono" x="130" y="198" text-anchor="middle">predict → verify gate</text>
 
   <rect class="box" x="40" y="225" width="180" height="56" rx="7"/>
   <text class="h" x="130" y="249" text-anchor="middle">Stateful fuzzer</text>
@@ -66,7 +66,7 @@
 
   <rect class="box" x="570" y="155" width="180" height="56" rx="7"/>
   <text class="h" x="660" y="179" text-anchor="middle">Raw HTTP adapter</text>
-  <text class="s" x="660" y="198" text-anchor="middle">exact bodies, even unknown routes</text>
+  <text class="s" x="660" y="198" text-anchor="middle">auth · exact bodies · unknown routes</text>
 
   <rect class="box" x="570" y="230" width="180" height="56" rx="7"/>
   <text class="h" x="660" y="254" text-anchor="middle">Serial queue</text>
@@ -104,7 +104,7 @@
 
   <rect class="core" x="780" y="450" width="190" height="88" rx="7"/>
   <text class="h" x="875" y="476" text-anchor="middle">Drift canary</text>
-  <text class="s" x="875" y="497" text-anchor="middle">every 5 min vs original</text>
+  <text class="s" x="875" y="497" text-anchor="middle">every 10 min vs original</text>
   <text class="s" x="875" y="516" text-anchor="middle">diff → alert → re-probe</text>
 
   <!-- Edges -->
