@@ -3,7 +3,7 @@
 
 [Learning a black box, one proven rule at a time]{.subtitle}
 
-[Reto 2 · La caja negra · rubrica.dev · Kevin Vicent · v19 · For the judges and any engineer who rebuilds the replica]{.meta}
+[Reto 2 · La caja negra · rubrica.dev · Kevin Vicent · For the judges and any engineer who rebuilds the replica]{.meta}
 
 [The black box is an unknown decision procedure. We find its rules with experiments. We prove each rule against the real service. Then we compile the rules into a deterministic replica. Most agent systems need an LLM judge. Ours has an exact judge for every behavior it probes: the original service. What it never probes is the open risk, so we measure it.]{.thesis}
 :::
