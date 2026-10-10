@@ -30,19 +30,19 @@
   <!-- External systems -->
   <rect class="ext" x="390" y="18" width="220" height="62" rx="8"/>
   <text class="h" x="500" y="44" text-anchor="middle">Original service</text>
-  <text class="s" x="500" y="63" text-anchor="middle">POST /msg · CMD;args;control</text>
+  <text class="s" x="500" y="63" text-anchor="middle">POST /msg · {"m":"CMD;args;ctrl"}</text>
 
-  <rect class="ext" x="700" y="18" width="270" height="62" rx="8"/>
-  <text class="h" x="835" y="44" text-anchor="middle">Evaluator · hidden test set</text>
-  <text class="s" x="835" y="63" text-anchor="middle">POST /__reset, then a sequence</text>
+  <rect class="ext" x="720" y="18" width="270" height="62" rx="8"/>
+  <text class="h" x="855" y="44" text-anchor="middle">Evaluator · hidden test set</text>
+  <text class="s" x="855" y="63" text-anchor="middle">POST /__reset, then a sequence</text>
 
   <!-- Discovery group -->
   <rect class="group" x="20" y="118" width="430" height="262" rx="10"/>
-  <text class="glabel" x="36" y="374">DISCOVERY · LOCAL</text>
+  <text class="glabel" x="36" y="374">AGENT HARNESS (SYSTEM 2) · LOCAL</text>
 
   <rect class="box" x="40" y="155" width="180" height="56" rx="7"/>
   <text class="h" x="130" y="179" text-anchor="middle">Probe</text>
-  <text class="s mono" x="130" y="198" text-anchor="middle">predict → verify gate</text>
+  <text class="s mono" x="130" y="198" text-anchor="middle">predict → budget gate</text>
 
   <rect class="box" x="40" y="225" width="180" height="56" rx="7"/>
   <text class="h" x="130" y="249" text-anchor="middle">Stateful fuzzer</text>
@@ -54,7 +54,7 @@
 
   <rect class="box" x="250" y="155" width="180" height="56" rx="7"/>
   <text class="h" x="340" y="179" text-anchor="middle">Trace store</text>
-  <text class="s mono" x="340" y="198" text-anchor="middle">traces/*.jsonl</text>
+  <text class="s mono" x="340" y="198" text-anchor="middle">experimentos.jsonl</text>
 
   <rect class="box" x="250" y="305" width="180" height="56" rx="7"/>
   <text class="h" x="340" y="329" text-anchor="middle">Spec + experiment log</text>
@@ -62,7 +62,7 @@
 
   <!-- Replica group -->
   <rect class="group" x="550" y="118" width="440" height="262" rx="10"/>
-  <text class="glabel" x="566" y="374">REPLICA · DEPLOYED · ONE PROCESS</text>
+  <text class="glabel" x="566" y="374">REPLICA (SYSTEM 1) · DEPLOYED · ONE PROCESS</text>
 
   <rect class="box" x="570" y="155" width="180" height="56" rx="7"/>
   <text class="h" x="660" y="179" text-anchor="middle">Raw HTTP adapter</text>
@@ -81,8 +81,8 @@
   <text class="s mono" x="875" y="196" text-anchor="middle">handle(state[token], msg)</text>
   <text class="s mono" x="875" y="211" text-anchor="middle">→ (state, resp)</text>
   <text class="s" x="875" y="234" text-anchor="middle">route → auth → parse</text>
-  <text class="s" x="875" y="251" text-anchor="middle">→ control → cmd → arity</text>
-  <text class="s" x="875" y="268" text-anchor="middle">→ lookup → rule → effect</text>
+  <text class="s" x="875" y="251" text-anchor="middle">→ control → command → arity</text>
+  <text class="s" x="875" y="268" text-anchor="middle">→ lookup → business rule → effect</text>
 
   <rect class="box" x="780" y="305" width="190" height="56" rx="7"/>
   <text class="h" x="875" y="329" text-anchor="middle">In-memory state</text>
@@ -100,12 +100,12 @@
   <rect class="core" x="570" y="450" width="180" height="88" rx="7"/>
   <text class="h" x="660" y="476" text-anchor="middle">Differential diff</text>
   <text class="s" x="660" y="497" text-anchor="middle">replay corpus vs replica</text>
-  <text class="s" x="660" y="516" text-anchor="middle">status · JSON body</text>
+  <text class="s" x="660" y="516" text-anchor="middle">status · exact body</text>
 
   <rect class="core" x="780" y="450" width="190" height="88" rx="7"/>
   <text class="h" x="875" y="476" text-anchor="middle">Drift canary</text>
-  <text class="s" x="875" y="497" text-anchor="middle">every 10 min vs original</text>
-  <text class="s" x="875" y="516" text-anchor="middle">diff → alert → re-probe</text>
+  <text class="s" x="875" y="497" text-anchor="middle">10-req canary every 10 min (M3)</text>
+  <text class="s" x="875" y="516" text-anchor="middle">diff → alert → re-probe (480 req)</text>
 
   <!-- Edges -->
   <path class="edge" d="M130,155 V49 H388" marker-end="url(#a)"/>
@@ -118,14 +118,14 @@
   <path class="edge" d="M340,211 V303" marker-end="url(#a)"/>
   <path class="edge hot" d="M430,333 H568" marker-end="url(#ah)"/>
   <text class="elabel" x="458" y="325">compiles into</text>
-  <path class="edge" d="M760,80 V104 H660 V153" marker-end="url(#a)"/>
+  <path class="edge" d="M855,80 V104 H660 V153" marker-end="url(#a)"/>
   <path class="edge" d="M660,211 V228" marker-end="url(#a)"/>
   <path class="edge" d="M750,258 H778" marker-end="url(#a)"/>
-  <path class="edge" d="M750,322 L778,290" marker-end="url(#a)"/>
+  <path class="edge" d="M750,333 H875 V288" marker-end="url(#a)"/>
   <path class="edge" d="M875,286 V303" marker-end="url(#a)"/>
   <path class="edge" d="M430,183 H480 V494 H568" marker-end="url(#a)"/>
   <text class="elabel" x="488" y="400">corpus</text>
-  <path class="edge hot" d="M660,450 V382" marker-end="url(#ah)"/>
+  <path class="edge hot" d="M570,480 H540 V183 H568" marker-end="url(#ah)"/>
   <path class="edge" d="M568,515 H422" marker-end="url(#a)"/>
   <path class="edge hot" d="M970,494 H1004 V92 H585 V82" marker-end="url(#ah)"/>
 </svg>
