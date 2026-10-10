@@ -3,7 +3,7 @@
 
 [Learning a black box, one proven rule at a time]{.subtitle}
 
-[Reto 2 · La caja negra · rubrica.dev · Kevin Vicent · v9]{.meta}
+[Reto 2 · La caja negra · rubrica.dev · Kevin Vicent · v10]{.meta}
 
 [The black box is an unknown decision procedure. We find its rules with experiments. We prove each rule against the real service. Then we compile the rules into a deterministic replica. Most agent systems need an LLM judge. Our system has an exact judge: the original service.]{.thesis}
 :::
@@ -20,20 +20,20 @@ We must build a replacement. After `/__reset`, each response must have **the sam
 |--|------------|---|-------|
 | A1 | The output depends only on state and request | open | Replay one sequence twice after reset |
 | A2 | Each token has its own state; `/__reset` restores `AC-0001`, `OP-0001` | README | Reset, then repeat a sequence |
-| A3 | The control is an integer checksum on arguments only (observed 11, 14, 65, 87, 92, 95, 98) | hypothesis | Fit offline, then targeted probes |
+| A3 | The control is an integer checksum on the arguments only (15 values seen, range 3–98) | hypothesis | Fit offline, then targeted probes |
 | A3b | The control is checked before the account lookup | **proven** | Bad control + missing account → E202 |
 | A4 | Tests are sequential | README | — |
 
 **Hard cases:** the control formula · auth (team token, other token, no token) · **error precedence** (E2xx integrity, E301/E302 syntax, E401 lookup, E506/E507 business) · ID sequences · `ANULA` twice · limits · unknown routes · **drift**.
 
-**Out of scope:** headers (the tests do not compare them) · latency below 5 s (the platform only requires < 5 s per step).
+**Out of scope:** headers (the tests do not compare them) · latency under the 5 s step limit.
 
 ## 3. How we measure: evals first
 
 We optimize against evals and protect them from Goodhart's Law: **corpus** = train · **held-out fuzz** = test · **canary** = "is the eval still true?" · **hidden set** = final test.
 
 - **M1 Exact match** (official comparator): 100% on the corpus (versioned per service version) and the 20 `ejemplos`; **≥ 95% on held-out fuzz**. We never fix code against held-out fuzz.
-- **M2 Coverage:** command × precondition × error matrix. Low-confidence rules and empty cells first. **Budget: 8,000 requests/day, 10/s per token.** Plan (565 already spent): 1,435 discovery · 2,500 fuzz · 480 canary · 3,020 reserve.
+- **M2 Coverage:** command × precondition × error matrix. Low-confidence rules and empty cells first. **Budget: 8,000 requests/day, 10/s per token.** Plan (566 already spent): 1,435 discovery · 2,500 fuzz · 480 canary · 3,019 reserve.
 - **M3 Drift:** a 10-request canary every 10 min (480 requests, 12:00–20:00). Full replay only if it fails. Detect in ≤ 10 min, fix in ≤ 45 min.
 - **Checksum eval:** predict all logged controls (train) and new strings with digits, lowercase and accents (test).
 - **Seeded tests:** each error alone and **in pairs**, control ±1, case variants, arity ±1, `ANULA` twice, transfers near the limit.

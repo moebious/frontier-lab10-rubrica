@@ -37,7 +37,7 @@
   <!-- External systems -->
   <rect class="ext" x="463" y="12" width="260" height="74" rx="8"/>
   <text class="h" x="593" y="34" text-anchor="middle">Original service</text>
-  <text class="s mono" x="593" y="53" text-anchor="middle">POST /msg · CMD;args;control</text>
+  <text class="s mono" x="593" y="53" text-anchor="middle">POST /msg · {"m":"CMD;args;ctrl"}</text>
   <text class="s" x="593" y="72" text-anchor="middle">changes during the day</text>
 
   <rect class="ext" x="790" y="12" width="280" height="74" rx="8"/>
@@ -105,9 +105,10 @@
   <text class="h" x="1102" y="178" text-anchor="middle">Decision core</text>
   <text class="s mono" x="1102" y="196" text-anchor="middle">handle(state[token], msg)</text>
   <text class="s mono" x="1102" y="211" text-anchor="middle">→ (state, resp)</text>
-  <text class="s" x="1102" y="234" text-anchor="middle">route → auth → parse</text>
-  <text class="s" x="1102" y="251" text-anchor="middle">→ control → cmd → arity</text>
-  <text class="s" x="1102" y="268" text-anchor="middle">→ lookup → rule → effect</text>
+  <text class="s" x="1102" y="230" text-anchor="middle">route → auth → parse</text>
+  <text class="s" x="1102" y="245" text-anchor="middle">→ control → command</text>
+  <text class="s" x="1102" y="260" text-anchor="middle">→ arity → lookup</text>
+  <text class="s" x="1102" y="275" text-anchor="middle">→ business rule → effect</text>
 
   <rect class="box" x="1005" y="305" width="195" height="56" rx="7"/>
   <text class="h" x="1102" y="329" text-anchor="middle">In-memory state</text>
@@ -129,7 +130,7 @@
 
   <rect class="core" x="1005" y="450" width="195" height="88" rx="7"/>
   <text class="h" x="1102" y="476" text-anchor="middle">Drift canary</text>
-  <text class="s" x="1102" y="497" text-anchor="middle">10 requests every 10 min</text>
+  <text class="s" x="1102" y="497" text-anchor="middle">M3 · 10 req every 10 min</text>
   <text class="s" x="1102" y="516" text-anchor="middle">diff → triage → re-probe</text>
 
   <!-- Edges: System 2 -->
@@ -159,6 +160,7 @@
 
   <!-- Edges: harness -->
   <path class="edge hot" d="M900,450 V382" marker-end="url(#ah)"/>
+  <text class="elabel" x="908" y="424">via HTTP</text>
   <path class="edge" d="M778,515 H422" marker-end="url(#a)"/>
   <path class="edge hot" d="M1200,494 H1232 V4 H650 V10" marker-end="url(#ah)"/>
 
