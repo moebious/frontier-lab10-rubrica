@@ -20,7 +20,7 @@
 |---|---|---|
 | 13:15–13:45 | **M0 Tooling** | Gate (with the verifier cascade), strict log writer/reader, offline checksum solver, diff tool and smoke check work locally |
 | 13:45–14:30 | **M1 Discovery sprint 1** (~350 requests, one rule per probe) | Error catalog for the initial state; checksum solved or narrowed; command happy paths known |
-| 14:30–15:15 | **M2 Replica v1 + deploy** | 20/20 examples and 100% of the corpus locally; deployed on Fly.io; smoke check passes |
+| 14:30–15:15 | **M2 Replica v1 + deploy** | 20/20 examples and 100% of the corpus locally; deployed on Fly.io; smoke check passes on `fly.dev`, then on `blackbox.rubrica.dev` |
 | 15:00–15:25 | **Golden snapshot + canary** (runs in the background while M2 finishes) | Batch sequences cover every v1 rule; canary running **before 15:30** |
 | ~15:15 | **Validation #1** (skip if v1 is not deployed yet) | Per-category numbers |
 | 15:30–17:00 | **M4 Incident (drift)** | Canary detects the change; replay under v1 vs. v2 localizes it; rules v2 deployed |
@@ -90,6 +90,8 @@ Priority 1 is the initial-state error matrix, because it covers the 40 single-re
 
 **Hosting:** Fly.io (`flyctl` is installed): 1 machine, `min_machines_running = 1`, auto-stop off, health check on `/health`, team token as a secret. Rejected: Vercel (serverless instances do not share in-memory state) and Hugging Face Spaces (sleep and cold starts against the 5 s step limit; the proxy may not pass `Authorization: Bearer` through untouched).
 
+**Public entrypoint: `blackbox.rubrica.dev`**, a CNAME to the Fly app; Fly issues the TLS certificate (`.dev` requires HTTPS). It decouples the URL we submit from the hosting provider: if Fly fails, we repoint the CNAME instead of resubmitting. We submit it only after the smoke check passes through it; until then the `fly.dev` URL is the fallback.
+
 ## 7. Tooling (the harness)
 
 | Tool | Job |
@@ -119,6 +121,7 @@ Priority 1 is the initial-state error matrix, because it covers the 40 single-re
 |---|---|---|
 | 1 | **Team token** from the challenge card at `/evento` | The replica must accept it; it goes into a Fly secret, not into the repo |
 | 2 | **Fly.io login:** run `fly auth whoami`, or `fly auth login` if needed | Deploy target; only you can log in |
+| 2b | **DNS at name.com:** a CNAME record `blackbox` → the Fly app's hostname (I will give you the exact target in M2) | Only you have access to the `rubrica.dev` DNS |
 | 3 | **Teammate?** | A second token doubles the budget and allows parallel exploration |
 | 4 | **Ask the mentors:** (a) in the tests, does "otro token" mean an invalid token or another participant's valid token? (b) is the 15:30 incident the service change, or a separate event? (c) do `/__reset` calls belong in `experimentos.jsonl`? | Each answer changes a rule in the replica or the log |
 
@@ -128,7 +131,8 @@ Priority 1 is the initial-state error matrix, because it covers the 40 single-re
 |---|---|
 | Ideas adopted from Calvino: ordered first-match rules with rule IDs, versioned rules + replay, independent tests, strict JSONL log, deployment smoke check, secret patterns in the hook | **In the build** |
 | Ideas adopted from the verifier study: batch vs. per-rule probes, verifier cascade, atomic spec + deterministic spec verifier | **In the build** |
-| GitHub Actions CI, `DECISIONS.md` format, `caja.rubrica.dev` custom domain | **Only if time remains after 18:45** |
+| GitHub Actions CI, `DECISIONS.md` format | **Only if time remains after 18:45** |
+| `blackbox.rubrica.dev` as the public entrypoint | **In M2**, after the `fly.dev` URL works |
 | "System 1.5" in the doc or diagram | **No** (pitch and debrief only: Rubrica merges Calvino's System 1 and 1.5 because the input is a formal protocol) |
 | Calvino's git flow, Hugging Face Spaces, LLM judges, Laya or Jev | **No** (cost higher than value today) |
 
