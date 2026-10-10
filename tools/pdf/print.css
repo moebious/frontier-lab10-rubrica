@@ -1,6 +1,27 @@
-@page { size: Letter; margin: 0.28in; }
-body { font: 7.9pt/1.22 -apple-system, "Helvetica Neue", Arial, sans-serif; color:#111; }
-h1 { font-size: 12pt; margin: 0 0 1.5pt; } h2 { font-size: 9.2pt; margin: 4pt 0 1.5pt; border-bottom: 1px solid #ccc; }
-p, ul, ol { margin: 1.5pt 0; } li { margin: 0; } blockquote { margin: 2.5pt 0; padding: 1.5pt 5pt; border-left: 3px solid #0b6bcb; background:#f2f7fd; }
-table { border-collapse: collapse; width: 100%; font-size: 6.9pt; margin: 2pt 0; } th, td { border: 1px solid #ccc; padding: 1pt 3pt; vertical-align: top; text-align:left; } th { background:#f2f2f2; }
-code { font: 7.2pt Menlo, monospace; }
+@page { size: Letter landscape; margin: 0.32in 0.4in; }
+:root { --ink:#16181d; --muted:#5b6370; --accent:#0b5cad; --rule:#d5dbe3; --zebra:#f5f7fa; --tint:#eef4fb; }
+* { box-sizing: border-box; }
+body { font: 7.6pt/1.26 -apple-system, "Helvetica Neue", Arial, sans-serif; color: var(--ink); margin: 0; }
+header#title-block-header { display: none; }
+
+.header { border-bottom: 2px solid var(--accent); padding-bottom: 6pt; margin-bottom: 8pt; }
+.header h1 { font-size: 16pt; margin: 0; color: var(--accent); letter-spacing: -0.01em; }
+.header p { margin: 0; }
+.subtitle { display: block; font-size: 11pt; font-weight: 600; margin-top: 1pt; }
+.meta { display: block; font-size: 8pt; color: var(--muted); margin-top: 1pt; }
+.thesis { display: block; font-size: 8.8pt; line-height: 1.4; margin-top: 5pt; }
+
+.cols { display: grid; grid-template-columns: 1fr 1fr; column-gap: 18pt; }
+h2 { font-size: 10.5pt; color: var(--accent); margin: 6pt 0 4pt; padding-bottom: 2pt; border-bottom: 1px solid var(--rule); }
+.col > h2:first-child { margin-top: 0; }
+p { margin: 3pt 0; }
+ul, ol { margin: 3pt 0; padding-left: 14pt; }
+li { margin: 2pt 0; }
+strong { font-weight: 650; }
+
+table { border-collapse: collapse; width: 100%; font-size: 7.4pt; line-height: 1.25; margin: 5pt 0; }
+th { background: var(--tint); color: var(--accent); text-align: left; font-weight: 650; }
+th, td { padding: 3pt 5pt; vertical-align: top; border-bottom: 1px solid var(--rule); }
+tbody tr:nth-child(even) td { background: var(--zebra); }
+
+code { font: 7pt Menlo, monospace; background: #f1f3f6; padding: 0 2px; border-radius: 2px; }
