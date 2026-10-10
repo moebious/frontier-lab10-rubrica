@@ -3,7 +3,7 @@
 
 [Learning a black box, one proven rule at a time]{.subtitle}
 
-[Reto 2 · La caja negra · rubrica.dev · Kevin Vicent · v18 · For the judges and any engineer who rebuilds the replica]{.meta}
+[Reto 2 · La caja negra · rubrica.dev · Kevin Vicent · v19 · For the judges and any engineer who rebuilds the replica]{.meta}
 
 [The black box is an unknown decision procedure. We find its rules with experiments. We prove each rule against the real service. Then we compile the rules into a deterministic replica. Most agent systems need an LLM judge. Ours has an exact judge for every behavior it probes: the original service. What it never probes is the open risk, so we measure it.]{.thesis}
 :::
@@ -13,7 +13,7 @@
 
 An undocumented service receives text messages on `POST /msg` (body `{"m": "…"}`) and keeps state between requests. It also has `/__reset` and `/health`. Each token has its own state. The service changes during the day, without notice.
 
-**Goals:** ① the same status and body as the original on the 100 hidden tests (40 single requests, 60 sequences of 2–12 steps), run on the **20:00 version** · ② a spec and an experiment log in which every claim cites evidence · ③ stay correct after the service changes. Every observable behavior is part of the contract (Hyrum's Law), errors included.
+**Goals:** ① the same status and body as the original on the 100 hidden tests (40 single requests, 60 sequences of 2–12 steps), run on the **20:00 version** · ② a spec and an experiment log in which every claim cites evidence, re-checked by code before we submit (a false claim subtracts points) · ③ stay correct after the service changes. Every observable behavior is part of the contract (Hyrum's Law), errors included.
 
 **Non-goals:** fixing the original (we copy its errors) · state that survives a restart (every test starts with a reset) · latency under the 5 s step limit · headers (the tests do not compare them).
 
@@ -28,17 +28,19 @@ An undocumented service receives text messages on `POST /msg` (body `{"m": "…"
 
 **Hard cases:** computed values (for example integrity checks) · error precedence · generated IDs · repeated operations · limits · auth variants · unknown routes · **changes during the day**.
 
+**Priority:** 40 of the 100 tests are single requests right after a reset, so behaviors reachable from the initial state are probed first.
+
 ## 2. Interface: what the replica must do
 
 - `GET /health` → 200 when ready · `POST /__reset` → initial state · **any other route or method** → exactly the original's status and body.
 - **Auth:** `Authorization: Bearer <team token>` on every call; another token, or none, gets the original's answer for that case.
-- **No matching rule** → a default chosen from evidence, marked *supuesto* in the spec. One process; < 5 s per step; never calls the original.
+- **No matching rule** → a default chosen from evidence, marked *supuesto* in the spec. One process; < 5 s per step; never calls the original: that scores 0 (README), so a test fails on any outbound connection.
 
 ## 3. Architecture: dual-process, one ontology
 
 We use Kahneman's terms. **System 2** is slow and deliberate: the offline loop that discovers the rules. **System 1** is fast and automatic: the deployed replica that applies them.
 
-1. **Agent harness (System 2, offline).** A *harness* is the code around a model that gives it tools, memory and limits. A person and a reasoning model use only recorded tools (`probe`, `sequence`, `fuzz`, `diff`, `shrink`: minimize a failing sequence); each request is logged with its hypothesis. **No request without a prediction:** a code gate blocks requests with no prediction, already answered by the log, or over budget. When several candidate rules fit the evidence, the harness sends the request that best separates them; an unknown rule gets at most 50 probes, then becomes a documented default (*supuesto*).
+1. **Agent harness (System 2, offline).** A *harness* is the code around a model that gives it tools, memory and limits. A person and a reasoning model use only recorded tools (`probe`, `sequence`, `fuzz`, `diff`, `shrink`: minimize a failing sequence); each request is logged with its hypothesis. **No request without a prediction:** a code gate blocks requests with no prediction, already answered by the log, or over budget. Rate-limit responses come from the infrastructure, so they are dropped, never learned. When several candidate rules fit the evidence, the harness sends the request that best separates them; an unknown rule gets at most 50 probes, then becomes a documented default (*supuesto*). A learned formula is trusted only after it predicts inputs it has never seen.
 2. **Service ontology (memory).**
     - **What it is:** an explicit model of a domain: its concepts and the relations between them. Ours models the black box.
     - **What it holds:** operations, fields, state, rules, errors and evidence. A rule applies to an operation, needs preconditions, returns a response, changes state, outranks other rules and is proven by log lines. Its confidence uses the README's levels: *confirmado* (proven, repeated), *probable* (seen once or inferred), *supuesto* (untested default).
@@ -57,9 +59,9 @@ We use Kahneman's terms. **System 2** is slow and deliberate: the offline loop t
 
 The **recorded corpus** guides fixes; **held-out tests** only measure, so the score stays honest (Goodhart's Law). A different generator builds them (mutations of the README examples, structure-agnostic fuzz), so they do not share our blind spots.
 
-- **Differential test:** replays every recorded sequence against the replica and compares status and body with the original's. Target: 100% on the corpus and README examples; **≥ 95% on held-out tests**.
+- **Differential test:** replays every recorded sequence against the replica and compares status and body with the original's. Target: 100% on the current version's corpus; **≥ 95% on held-out tests**.
 - **Drift canary:** every 10 min, 10 requests to the original (5 fixed on the most-tested paths, 5 rotating through the corpus). A difference from the recorded answer, except values that change on every run (such as timestamps), means the service changed. Detect in ≤ 10 min on fixed paths, one rotation elsewhere. **Fix in ≤ 45 min:** re-probe the changed rules, new version, rerun the differential test, redeploy.
-- **Coverage:** operation × precondition × error matrix, low-confidence rules first. **Discovery rate:** new behaviors per 100 probes; an area is done at zero. **Budget:** 8,000 requests/day, 10/s (README).
+- **Coverage:** operation × precondition × error matrix, low-confidence rules first. **Discovery rate:** new behaviors per 100 probes; an area is done at zero. **Budget:** 8,000 requests/day, 10/s (README); half is held back to re-learn after changes, since the 20:00 version is the one scored.
 - **Designed tests:** each error alone and **in pairs**, boundary values ±1, case and whitespace variants, field count ±1, repeated operations, limits.
 - **Validations:** 3 hidden-set runs, spent only if the exact-match rate did not decrease (~15:15, ~17:15, ~19:30).
 
