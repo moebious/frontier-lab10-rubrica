@@ -1,6 +1,6 @@
 @page { size: Letter; margin: 0.28in; }
-body { font: 7.4pt/1.16 -apple-system, "Helvetica Neue", Arial, sans-serif; color:#111; }
+body { font: 7.9pt/1.22 -apple-system, "Helvetica Neue", Arial, sans-serif; color:#111; }
 h1 { font-size: 12pt; margin: 0 0 1.5pt; } h2 { font-size: 9.2pt; margin: 4pt 0 1.5pt; border-bottom: 1px solid #ccc; }
 p, ul, ol { margin: 1.5pt 0; } li { margin: 0; } blockquote { margin: 2.5pt 0; padding: 1.5pt 5pt; border-left: 3px solid #0b6bcb; background:#f2f7fd; }
 table { border-collapse: collapse; width: 100%; font-size: 6.9pt; margin: 2pt 0; } th, td { border: 1px solid #ccc; padding: 1pt 3pt; vertical-align: top; text-align:left; } th { background:#f2f2f2; }
-code { font: 7.8pt Menlo, monospace; }
+code { font: 7.2pt Menlo, monospace; }

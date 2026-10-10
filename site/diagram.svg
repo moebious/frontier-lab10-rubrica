@@ -46,7 +46,7 @@
 
   <rect class="box" x="40" y="225" width="180" height="56" rx="7"/>
   <text class="h" x="130" y="249" text-anchor="middle">Stateful fuzzer</text>
-  <text class="s" x="130" y="268" text-anchor="middle">random op sequences</text>
+  <text class="s" x="130" y="268" text-anchor="middle">targeted op sequences</text>
 
   <rect class="box" x="40" y="305" width="180" height="56" rx="7"/>
   <text class="h" x="130" y="329" text-anchor="middle">Shrinker</text>
