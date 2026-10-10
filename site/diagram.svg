@@ -144,6 +144,9 @@
   <path class="edge" d="M340,211 V228" marker-end="url(#a)"/>
   <path class="edge" d="M340,286 V303" marker-end="url(#a)"/>
   <path class="edge hot" d="M430,333 H476" marker-end="url(#ah)"/>
+  <path class="edge" d="M130,286 V303" marker-end="url(#a)"/>
+  <path class="edge" d="M340,450 V363" marker-end="url(#a)"/>
+  <text class="elabel" x="348" y="402">failing cases</text>
 
   <!-- Edges: ontology to System 1 and to the harness -->
   <path class="edge hot" d="M593,361 V395 H830 V363" marker-end="url(#ah)"/>

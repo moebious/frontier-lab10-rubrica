@@ -1,4 +1,4 @@
-# Rubrica: Execution Plan (12:30 → 20:00)
+# Rubrica: Execution Plan (13:15 → 20:00)
 
 **Goal:** a deployed replica that passes the most hidden tests at 20:00, plus a spec and an experiment log that a judge can verify line by line.
 
@@ -14,43 +14,44 @@
 
 **Key insight: 40 of the 100 tests are single requests after a reset.** On an empty state, a single request can only exercise errors (auth, routes, body, syntax, control, unknown accounts), `PING` and `ALTA`. **The error matrix on the initial state is worth about 40% of the hidden set**, so it comes first. The other 60 tests are sequences that need correct balances, IDs, limits and `ANULA`.
 
-## 2. Timeline
+## 2. Timeline (re-planned at 13:06; about 25 minutes behind the first plan)
 
 | Time | Milestone | Done when |
 |---|---|---|
-| 12:30–12:45 | **Plan approved** | You confirm the open decisions (section 9) |
-| 12:45–13:15 | **M0 Tooling** | Gate, official log writer, offline checksum solver and diff tool work locally |
-| 13:15–14:00 | **M1 Discovery sprint 1** (~350 requests) | Error catalog for the initial state; checksum solved or narrowed; command happy paths known |
-| 14:00–14:45 | **M2 Replica v1 + deploy** | 20/20 examples and 100% of the corpus locally; deployed on Fly.io; remote diff passes |
-| ~14:45 | **Validation #1** | Per-category numbers tell us where we are weak |
-| 14:45–15:25 | **M3 Golden snapshot + fuzz** | Baseline corpus of the v1 service (every rule, ~150 sequences) recorded **before 15:30** |
-| 15:30–17:00 | **M4 Incident (drift)** | Canary detects the change; golden replay localizes it; rules v2 deployed |
+| 13:15–13:45 | **M0 Tooling** | Gate (with the verifier cascade), strict log writer/reader, offline checksum solver, diff tool and smoke check work locally |
+| 13:45–14:30 | **M1 Discovery sprint 1** (~350 requests, one rule per probe) | Error catalog for the initial state; checksum solved or narrowed; command happy paths known |
+| 14:30–15:15 | **M2 Replica v1 + deploy** | 20/20 examples and 100% of the corpus locally; deployed on Fly.io; smoke check passes |
+| 15:00–15:25 | **Golden snapshot + canary** (runs in the background while M2 finishes) | Batch sequences cover every v1 rule; canary running **before 15:30** |
+| ~15:15 | **Validation #1** (skip if v1 is not deployed yet) | Per-category numbers |
+| 15:30–17:00 | **M4 Incident (drift)** | Canary detects the change; replay under v1 vs. v2 localizes it; rules v2 deployed |
 | ~17:15 | **Validation #2** | Score after absorbing the change |
-| 17:15–18:45 | **M5 Coverage push** | Precedence pairs, boundaries, held-out fuzz ≥ 95%; spec and log generated |
+| 17:15–18:45 | **M5 Coverage push** | Precedence pairs, boundaries, held-out fuzz ≥ 95%; spec generated and verified |
 | 18:45–19:15 | **Video + README** | 2-minute video recorded |
-| 19:15–19:30 | **Freeze** | Final deploy; remote diff passes |
+| 19:15–19:30 | **Freeze** | Final deploy; smoke check passes |
 | ~19:30 | **Validation #3 (final)** | Last of the 3 runs |
 | 19:30–20:00 | **Submit** | Repo, entrypoint, video, spec, log on the platform; replica stays up through demo day |
-
-The design doc planned validation #1 at ~13:30. It moves to ~14:45 because the replica does not exist before then.
 
 ## 3. Request budget (8,000 per token per day; 566 already spent)
 
 | Use | Requests |
 |---|---|
 | Checksum: targeted probes | ≤ 50 |
-| Discovery sprint 1 (initial-state errors, commands) | 300 |
-| Golden snapshot of v1 (before 15:30) | 400 |
+| Discovery sprint 1 (one rule per probe) | 300 |
+| Golden snapshot of v1 (batch sequences) | 250 |
 | Precedence pairs + fuzz before the incident | 800 |
 | Canary, 13:30–20:00 (39 runs × 10) | 390 |
-| Incident: replay the golden snapshot against the changed service | 600 |
+| Incident: replay the golden snapshot against the changed service | 400 |
 | Fuzz after the incident | 1,200 |
 | Held-out test set | 300 |
-| **Reserve** | **3,394** |
+| **Reserve** | **3,744** |
 
 A teammate's token adds 8,000 more and lets us explore in parallel (each token has its own state).
 
 ## 4. Discovery backlog (each probe carries a prediction)
+
+**Two probing modes** (from the LangChain × Harvey verifier study: per-criterion checks are precise but expensive; batch checks are cheap but harder to attribute):
+- **One rule per probe** for discovery, where we must know exactly which rule answered.
+- **Batch sequences** (8–12 steps, many rules each) for the golden snapshot, the canary and regression. The first divergent step localizes a failure at no extra cost.
 
 Priority 1 is the initial-state error matrix, because it covers the 40 single-request tests.
 
@@ -62,8 +63,8 @@ Priority 1 is the initial-state error matrix, because it covers the 40 single-re
 | E6 | **Body parsing:** not JSON, empty, no `m`, `m` not a string, extra fields, empty `m` | ~15 | 1 |
 | E7 | **Message syntax:** empty fields, trailing `;`, case, spaces, unknown command, arity ±1 per command, control format (`03`, `99`, `-1`, ` 5`, `5X`) | ~40 | 1 |
 | E8–E13 | **Commands on the initial state** (`PING`, `ALTA`, `CONSULTA`, `DEPOSITO`, `TRANSFER`, `ANULA`): what each returns with no accounts | ~25 | 1 |
-| E14 | **Precedence:** which error wins when two apply (control vs command, arity vs control, lookup vs business) | ~40 | 2 |
-| E15 | **Command semantics:** `ALTA` name rules, amount rules (0, negative, decimal, huge), transfer limit boundary (100,000 to 120,000), same-account transfer, `ANULA` of a deposit or transfer, `ANULA` that would make a balance negative | ~100 | 2 |
+| E14 | **Precedence:** which error wins when two apply (control vs. command, arity vs. control, lookup vs. business) | ~40 | 2 |
+| E15 | **Command semantics:** `ALTA` name rules, amount rules (0, negative, decimal, huge), transfer limit boundary (100,000 to 120,000), same-account transfer, `ANULA` of a deposit or a transfer, `ANULA` that would make a balance negative | ~100 | 2 |
 | E16 | **IDs:** do failed operations consume an `AC-`/`OP-` number? Does `ANULA` create one? | ~20 | 2 |
 | E17 | **A1 determinism:** replay one sequence twice after reset | ~20 | 2 |
 | E18 | **`X-Req` semantics** (needed for the log's `x_req` field) | 0 (already in traces) | 3 |
@@ -80,51 +81,63 @@ Priority 1 is the initial-state error matrix, because it covers the 40 single-re
 
 | Module | Job |
 |---|---|
-| `rubrica/ontology.py` | Typed `Rule` records: ID, spec section, behavior, evidence (log IDs), confidence. **One source:** the core cites rule IDs, `SPEC.md` and the evidence tests are generated from it |
-| `rubrica/checksum.py` | The control function, versioned (v1, v2) |
-| `rubrica/core.py` | Pure `handle(state, request) → (state, response)`. No I/O |
-| `rubrica/server.py` | Standard-library HTTP server. **Single-threaded, so requests are serialized for free.** Team token from an environment variable |
-| `tests/` | Replays of the 20 examples and the corpus, plus adversarial cases: empty input, `null`, huge numbers, Unicode, malformed JSON |
+| `rubrica/ontology.py` | Typed `Rule` records: ID, spec section, behavior, evidence (log IDs), confidence. **Versioned (v1, v2).** One source: the core cites rule IDs, `SPEC.md` and the evidence tests are generated from it |
+| `rubrica/checksum.py` | The control function, versioned |
+| `rubrica/core.py` | Pure `handle(state, request) → (state, response, rule_id)`. **Ordered rules, the first match decides** (the pattern of Calvino's policy gate). No I/O |
+| `rubrica/server.py` | Standard-library HTTP server. **Single-threaded, so requests are serialized for free.** Team token from an environment variable. Adds an **`X-Rubrica-Rule` header** with the rule ID (headers are not compared, so it is free and makes every divergence diagnosable) |
+| `tests/` | **Independent of our code** (Calvino's oracle principle): evidence tests compare against the original's *recorded* responses, never against expectations derived from our rule table. Plus adversarial cases: empty input, `null`, huge numbers, Unicode, malformed JSON |
 | Anti-cheat guard | A test fails if `rubrica/` contains the original's hostname or opens any outbound connection |
 
-**Hosting:** Fly.io (`flyctl` is installed): 1 machine, `min_machines_running = 1`, auto-stop off, health check on `/health`, team token as a secret. Vercel is rejected: serverless instances do not share in-memory state.
+**Hosting:** Fly.io (`flyctl` is installed): 1 machine, `min_machines_running = 1`, auto-stop off, health check on `/health`, team token as a secret. Rejected: Vercel (serverless instances do not share in-memory state) and Hugging Face Spaces (sleep and cold starts against the 5 s step limit; the proxy may not pass `Authorization: Bearer` through untouched).
 
 ## 7. Tooling (the harness)
 
 | Tool | Job |
 |---|---|
-| `tools/harness.py` | **The gate:** refuses a request with no prediction, answers from cache if the same sequence is already logged, enforces per-phase budgets and ≤ 8 req/s. Writes raw traces and `experimentos.jsonl` in the official format |
+| `tools/harness.py` | **The gate:** refuses a request with no prediction, enforces per-phase budgets and ≤ 8 req/s. **Verifier cascade, cheapest first:** answer from the cache → from the recorded corpus → only then ask the live original. Writes raw traces and `experimentos.jsonl` |
+| `tools/jsonlog.py` | Strict JSONL writer and reader for `experimentos.jsonl` (Calvino's decision log): a malformed line fails and names its line number |
 | `tools/solve_checksum.py` | Offline hypothesis search (section 5) |
-| `tools/diff.py` | Replays the corpus against any target with the official comparator |
+| `tools/diff.py` | Replays the corpus against any target with the official comparator; shows the `X-Rubrica-Rule` of every divergence |
 | `tools/fuzz.py` | Stateful sequences from a grammar. **Once v1 exists, the replica is the predictor**, so every divergence is a learning signal |
-| `tools/shrink.py` | Greedy reduction of a divergent sequence to its minimal case |
-| `tools/canary.py` | 10 requests every 10 minutes against the original; alerts on any change |
-| `tools/gen_spec.py` | Renders `SPEC.md` (7 sections, `ID · Comportamiento · Evidencia · Confianza`) from the ontology |
+| `tools/shrink.py` | Greedy reduction of a divergent fuzz sequence to its minimal case |
+| `tools/canary.py` | 10 requests (one batch sequence) every 10 minutes against the original; alerts on any change |
+| `tools/smoke.py` | **Remote gate after every deploy** (Calvino's deployment check): `/health`, `/__reset`, the 20 examples, auth cases, an unknown route; one line per check with its latency; exit 0 only if all pass |
+| `tools/gen_spec.py` | Renders `SPEC.md` (7 sections, `ID · Comportamiento · Evidencia · Confianza`), **one atomic claim per row** |
+| `tools/verify_spec.py` | **Deterministic spec verifier** (from the verifier study): re-checks every row against the log lines it cites; a row whose evidence does not show its status and body is downgraded or removed. Protects against the "false claim subtracts" rule |
 
 ## 8. Drift playbook (the 15:30 incident)
 
-1. **Before 15:00:** record the golden snapshot of v1 (one sequence per rule).
+1. **Before 15:25:** record the golden snapshot of v1 as batch sequences.
 2. **Canary** every 10 minutes from 13:30 to 20:00.
-3. **On alert:** log the time and request count; replay the golden snapshot against the original; the diff report lists every changed rule.
-4. Update the ontology to v2, add regression tests, deploy, run validation #2.
+3. **On alert:** log the time and request count; replay the golden snapshot against the original; the first divergent step of each sequence names the changed rule.
+4. **Replay under v1 vs. v2** (Calvino's policy replay) to list every response the change affects; update the ontology to v2, add regression tests, deploy, run validation #2.
 5. Spec section 6 records what changed, when, and how we detected it, with log IDs.
 
 ## 9. Decisions and actions needed from you
 
 | # | Item | Why |
 |---|---|---|
-| 1 | **Approve this plan** (or change it) | Execution starts after this |
-| 2 | **Team token** from the challenge card at `/evento` | The replica must accept it; it goes into a Fly secret, not into the repo |
-| 3 | **Fly.io login:** run `fly auth whoami`, or `fly auth login` if needed | Deploy target; only you can log in |
-| 4 | **Teammate?** | A second token doubles the budget and allows parallel exploration |
-| 5 | **Ask the mentors:** (a) in the tests, does "otro token" mean an invalid token or another participant's valid token? (b) is the 15:30 incident the service change, or a separate event? (c) do `/__reset` calls belong in `experimentos.jsonl`? | Each answer changes a rule in the replica or the log |
+| 1 | **Team token** from the challenge card at `/evento` | The replica must accept it; it goes into a Fly secret, not into the repo |
+| 2 | **Fly.io login:** run `fly auth whoami`, or `fly auth login` if needed | Deploy target; only you can log in |
+| 3 | **Teammate?** | A second token doubles the budget and allows parallel exploration |
+| 4 | **Ask the mentors:** (a) in the tests, does "otro token" mean an invalid token or another participant's valid token? (b) is the 15:30 incident the service change, or a separate event? (c) do `/__reset` calls belong in `experimentos.jsonl`? | Each answer changes a rule in the replica or the log |
 
-## 10. Risks
+## 10. Scope decisions
+
+| Decision | Status |
+|---|---|
+| Ideas adopted from Calvino: ordered first-match rules with rule IDs, versioned rules + replay, independent tests, strict JSONL log, deployment smoke check, secret patterns in the hook | **In the build** |
+| Ideas adopted from the verifier study: batch vs. per-rule probes, verifier cascade, atomic spec + deterministic spec verifier | **In the build** |
+| GitHub Actions CI, `DECISIONS.md` format, `caja.rubrica.dev` custom domain | **Only if time remains after 18:45** |
+| "System 1.5" in the doc or diagram | **No** (pitch and debrief only: Rubrica merges Calvino's System 1 and 1.5 because the input is a formal protocol) |
+| Calvino's git flow, Hugging Face Spaces, LLM judges, Laya or Jev | **No** (cost higher than value today) |
+
+## 11. Risks
 
 | Risk | Mitigation |
 |---|---|
 | Checksum not found | Fallback: accept well-formed controls (*supuesto*); keep probing within the 50-request cap |
-| Fly login or deploy fails | Deploy v1 early (14:00) so there is time to switch platforms |
-| Budget runs out | Cache, never repeat a sequence, second token |
-| The incident changes something deep (for example the checksum) | The golden snapshot replay localizes it; the ontology is versioned |
-| False claims in the spec | Every row is generated from evidence; unproven rows are marked *probable* or *supuesto* |
+| Fly login or deploy fails | Deploy v1 by 15:15 so there is time to switch platforms |
+| Budget runs out | Verifier cascade (cache and corpus first), batch sequences, second token |
+| The incident changes something deep (for example the checksum) | Golden snapshot replay localizes it; the ontology is versioned |
+| False claims in the spec | One atomic claim per row; `verify_spec.py` checks each row against its evidence before submitting |

@@ -22,12 +22,21 @@ if printf '%s\n' "$added" | grep -Eq 'cn-[a-z]-[A-Za-z0-9_]+-[A-Za-z0-9_-]{6,}';
   fail=1
 fi
 
-# 3. No literal token values copied from .env.
+# 3. No API keys or credentials: OpenRouter/OpenAI/Anthropic (sk-…), GitHub, AWS,
+#    private keys, and api_key/secret_key assignments (adapted from Calvino's hook).
+#    The patterns are written so this file never matches itself.
+keys_re='sk-[A-Za-z0-9_-]{20,}|gh[pousr]_[A-Za-z0-9]{36,}|AKIA[0-9A-Z]{16}|-----BEGIN [A-Z ]*PRIVATE KEY-----|(api|secret)_?key[[:space:]]*[:=][[:space:]]*["'"'"'][A-Za-z0-9_-]{16,}'
+if printf '%s\n' "$added" | grep -Eqi -- "$keys_re"; then
+  echo "pre-commit: a staged change looks like it contains an API key or credential."
+  fail=1
+fi
+
+# 4. No literal secret values copied from .env (any *TOKEN= or *KEY= variable).
 if [ -f .env ]; then
-  for v in $(sed -n 's/^[A-Z_]*TOKEN=//p' .env); do
+  for v in $(sed -nE 's/^[A-Z_]*(TOKEN|KEY)=//p' .env); do
     [ -n "$v" ] || continue
     if printf '%s\n' "$added" | grep -qF -- "$v"; then
-      echo "pre-commit: a staged change contains a token value from .env."
+      echo "pre-commit: a staged change contains a secret value from .env."
       fail=1
     fi
   done

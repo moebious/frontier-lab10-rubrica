@@ -3,7 +3,7 @@
 
 [Learning a black box, one proven rule at a time]{.subtitle}
 
-[Reto 2 · La caja negra · rubrica.dev · Kevin Vicent · v10]{.meta}
+[Reto 2 · La caja negra · rubrica.dev · Kevin Vicent · v11]{.meta}
 
 [The black box is an unknown decision procedure. We find its rules with experiments. We prove each rule against the real service. Then we compile the rules into a deterministic replica. Most agent systems need an LLM judge. Our system has an exact judge: the original service.]{.thesis}
 :::
@@ -50,10 +50,10 @@ We optimize against evals and protect them from Goodhart's Law: **corpus** = tra
 
 | Decision | Chosen | Rejected, and why |
 |---|--------|----------|
-| Runtime | **Compiled rule table** | *LLM in the replica (allowed, ≤ 5 s):* not exact, not repeatable. *Record and replay:* fails on new inputs. |
+| Runtime | **Compiled rule table:** System 2 knowledge made automatic; no probabilities at runtime | *A probabilistic layer (LLM or classifier) feeding the rules, as natural-language systems need:* the input is a formal protocol, so there is nothing to perceive; not exact, not repeatable. *Record and replay:* fails on new inputs. |
 | Discovery | **A person and a model in a harness**, exact oracle | *Free LLM chat:* no proof, no log. *Autonomous agent:* false spec claims lose points. *Manual curl:* too slow. |
 | Knowledge | **Typed ontology**, one source for code, spec and tests | *Separate spec, code and tests:* they diverge after the change. *RAG over logs:* approximate recall. |
-| Checks | **Code for all exact checks** (budget gate, checksum, rule replay). A **System One classifier** only for drift triage and model routing; it fails closed. | *LLM judge as verifier:* false passes. The original is a free, exact judge. |
+| Checks | **Code for all exact checks, cheapest first:** cache → recorded corpus → live original (budget gate, checksum, rule replay). Drift triage in code; a **System One classifier** only if code cannot separate drift from noise. Fails closed. | *LLM judge as verifier:* false passes. The original is a free, exact judge. |
 | Server and hosting | **Minimal server we control** (exact bodies, also for unknown routes); **one always-on instance** | *Framework defaults:* different 404/405 bodies. *Autoscaling:* each instance has its own state. |
 
 **Risks:** formula outside our family (add candidates, probe again) · budget runs out (cache, never repeat) · late drift (canary runs until 20:00).
