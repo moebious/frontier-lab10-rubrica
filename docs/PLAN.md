@@ -42,7 +42,7 @@
 | Canary, 13:30–20:00 (39 runs × 10) | 390 |
 | Incident: replay the golden snapshot against the changed service | 400 |
 | Fuzz after the incident | 1,200 |
-| Held-out test set | 300 |
+| Held-out test set (built by a different generator: mutations of the README examples and structure-agnostic fuzz, so it does not share our blind spots) | 300 |
 | **Reserve** | **3,744** |
 
 A teammate's token adds 8,000 more and lets us explore in parallel (each token has its own state).
@@ -75,6 +75,7 @@ Priority 1 is the initial-state error matrix, because it covers the 40 single-re
 
 - **What we know:** values range 3–98 (so likely `98 − (x mod 97)`, IBAN-style); the last character weighs 3 and the one before it weighs 30 (base 10, mod 97); the command case does not matter.
 - **Bug in our earlier offline search:** it required `control = x mod M` with M > 98. That excludes the `98 − (x mod 97)` mapping. The new solver searches `control = T − ((a·P + b) mod 97)`, where `P` is a base-10 fold over the characters, across several scopes (arguments only, with the command, separators) and character mappings.
+- **Stop rule (any unknown rule):** if no candidate survives after 50 probes, the rule becomes *supuesto* (a documented default) and we move on.
 - **Fallback if no formula fits by 14:00:** the replica accepts any well-formed numeric control and returns E202 only for cases we have proven. This passes every test that uses a valid control. It is recorded in the spec as a ***supuesto***.
 
 ## 6. Replica design (Python standard library, no dependencies)
@@ -100,9 +101,9 @@ Priority 1 is the initial-state error matrix, because it covers the 40 single-re
 | `tools/jsonlog.py` | Strict JSONL writer and reader for `experimentos.jsonl` (Calvino's decision log): a malformed line fails and names its line number |
 | `tools/solve_checksum.py` | Offline hypothesis search (section 5) |
 | `tools/diff.py` | Replays the corpus against any target with the official comparator; shows the `X-Rubrica-Rule` of every divergence |
-| `tools/fuzz.py` | Stateful sequences from a grammar. **Once v1 exists, the replica is the predictor**, so every divergence is a learning signal |
+| `tools/fuzz.py` | Stateful sequences from a grammar. **Once v1 exists, the replica is the predictor**, so every divergence is a learning signal. Reports the **discovery rate** (new behaviors per 100 probes); an area is done when it reaches zero |
 | `tools/shrink.py` | Greedy reduction of a divergent fuzz sequence to its minimal case |
-| `tools/canary.py` | 10 requests (one batch sequence) every 10 minutes against the original; alerts on any change |
+| `tools/canary.py` | **Rotating canary:** every 10 minutes, 10 requests to the original: 5 fixed on the most-tested paths (initial-state behaviors) and 5 rotating through the recorded corpus. Alerts on any difference |
 | `tools/smoke.py` | **Remote gate after every deploy** (Calvino's deployment check): `/health`, `/__reset`, the 20 examples, auth cases, an unknown route; one line per check with its latency; exit 0 only if all pass |
 | `tools/gen_spec.py` | Renders `SPEC.md` (7 sections, `ID · Comportamiento · Evidencia · Confianza`), **one atomic claim per row** |
 | `tools/verify_spec.py` | **Deterministic spec verifier** (from the verifier study): re-checks every row against the log lines it cites; a row whose evidence does not show its status and body is downgraded or removed. Protects against the "false claim subtracts" rule |

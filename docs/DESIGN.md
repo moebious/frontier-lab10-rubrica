@@ -3,9 +3,9 @@
 
 [Learning a black box, one proven rule at a time]{.subtitle}
 
-[Reto 2 · La caja negra · rubrica.dev · Kevin Vicent · v13]{.meta}
+[Reto 2 · La caja negra · rubrica.dev · Kevin Vicent · v14]{.meta}
 
-[The black box is an unknown decision procedure. We find its rules with experiments. We prove each rule against the real service. Then we compile the rules into a deterministic replica. Most agent systems need an LLM judge. Our system has an exact judge: the original service.]{.thesis}
+[The black box is an unknown decision procedure. We find its rules with experiments. We prove each rule against the real service. Then we compile the rules into a deterministic replica. Most agent systems need an LLM judge. Ours has an exact judge for every behavior it probes: the original service. What it never probes is the open risk, so we measure it.]{.thesis}
 :::
 
 ::: {.cols}
@@ -32,11 +32,11 @@ We must build a replacement. After `/__reset`, each response must have **the sam
 
 ## 3. How we measure: evals first
 
-The **recorded corpus** guides fixes; **held-out tests** only measure, so the score stays honest (Goodhart's Law).
+The **recorded corpus** guides fixes; **held-out tests** only measure, so the score stays honest (Goodhart's Law). A different generator builds them, so they do not share our blind spots.
 
 - **Differential test:** replays every recorded sequence against the replica and compares status and body with the original's answers. Target: 100% on the corpus and the README examples; **≥ 95% on held-out tests**.
-- **Drift canary:** every 10 min, sends a fixed 10-request sequence to the original and compares the answers with the recorded ones; a difference means the service changed. Detect in ≤ 10 min, fix in ≤ 45 min.
-- **Coverage:** operation × precondition × error matrix. Low-confidence rules and empty cells first. **Budget (README): 8,000 requests/day, 10/s per token**, spent in this order: discovery, fuzz, canary, reserve.
+- **Drift canary:** every 10 min, sends 10 requests to the original: 5 fixed on the most-tested paths and 5 that rotate through the recorded corpus. A difference with the recorded answer means the service changed. Detect in ≤ 10 min on the fixed paths and within one rotation elsewhere; fix in ≤ 45 min.
+- **Coverage:** operation × precondition × error matrix; low-confidence rules and empty cells first. **Discovery rate:** new behaviors per 100 probes; an area is done when it reaches zero. **Budget (README): 8,000 requests/day, 10/s per token**, spent in this order: discovery, fuzz, canary, reserve.
 - **Inference eval:** a learned formula must predict the logged values (train) and fresh inputs it has never seen (test).
 - **Seeded tests:** each error alone and **in pairs**, boundary values ±1, case and whitespace variants, field count ±1, repeated operations, limits.
 - **3 validations:** only if the exact-match rate did not decrease (~15:15, ~17:15, ~19:30).
@@ -48,16 +48,16 @@ The **recorded corpus** guides fixes; **held-out tests** only measure, so the sc
 We use Kahneman's terms. **System 2** is slow and deliberate: the offline loop that discovers the rules. **System 1** is fast and automatic: the deployed replica that applies them.
 
 1. **Agent harness (System 2, offline).** A person and a reasoning model use only recorded tools: `probe`, `sequence`, `fuzz`, `shrink`, `diff`. Each request becomes one line of `experimentos.jsonl`, with its hypothesis and `X-Req`. **Rule: no request without a prediction.** A code gate in the harness blocks a request if it has no prediction, if the log already answers it, or if it exceeds the budget.
-2. **Hypothesis search, not answer search.** A blind sweep spends the budget on answers we could predict (our first one cost 543 requests). Instead, the harness fits candidate rules offline, at zero cost, and sends the request that eliminates the most candidates. **Target: fewer than 50 probes per unknown rule.**
-3. **Service ontology (memory).** Each rule records its condition, response, effect, evidence and confidence. Integrity checks, errors and state changes are all rules. Confidence uses the README's levels: *confirmado* (proven, repeated), *probable* (seen once or inferred), *supuesto* (untested default). One table does three jobs: the replica **executes** it, `SPEC.md` is **generated** from it, and the tests come from its evidence. **Rules are versioned, so a behavior change is new data, not a new design.**
+2. **Hypothesis search, not answer search.** A blind sweep spends the budget on answers we could predict (our first one cost 543 requests). Instead, the harness fits candidate rules offline and sends the request that eliminates the most candidates. **Target: fewer than 50 probes per unknown rule.** If no candidate survives, the rule becomes *supuesto* (a documented default) and we move on.
+3. **Service ontology (memory).** Each rule records its condition, response, effect, evidence and confidence. Errors, checks and state changes are all rules. Confidence uses the README's levels: *confirmado* (proven, repeated), *probable* (seen once or inferred), *supuesto* (untested default). One table does three jobs: the replica **executes** it, `SPEC.md` is **generated** from it, and the tests come from its evidence. **Rules are versioned: most behavior changes are new data, and a new operation is one more rule behind the same interface.**
 4. **Replica (System 1, runtime).** HTTP adapter → serial queue → decision core. **The first matching rule decides; the precedence order is learned and versioned in the ontology.** State is in memory, one state per token.
 
 | Decision | Chosen | Rejected, and why |
 |---|--------|----------|
-| Runtime | **Compiled rule table:** System 2 knowledge made automatic; no probabilities at runtime | *A probabilistic layer (LLM or classifier):* the input is a formal protocol, so there is nothing to perceive; not exact, not repeatable. *Record and replay:* fails on new inputs. |
+| Runtime | **Compiled rule table:** System 2 knowledge made automatic; no probabilities at runtime | *A probabilistic layer (LLM or classifier):* a formal protocol has nothing to perceive; not exact or repeatable. *Record and replay:* fails on new inputs. |
 | Discovery | **A person and a model in a harness**, exact oracle | *Free LLM chat:* no proof, no log. *Autonomous agent:* false spec claims lose points. *Manual curl:* too slow. |
 | Knowledge | **Typed ontology**, one source for code, spec and tests | *Separate spec, code and tests:* they diverge after the change. *RAG over logs:* approximate recall. |
-| Checks | **Code for every exact check, cheapest first:** cache → recorded corpus → live original. Drift triage in code; a **System One classifier** only if code cannot separate drift from noise. | *LLM judge as verifier:* false passes. The original is a free, exact judge. |
+| Checks | **Code for every exact check, cheapest first:** cache → corpus → live original. A **System One classifier** only if code cannot tell drift from noise. | *LLM judge as verifier:* false passes. The original is a free, exact judge. |
 | Server and hosting | **Minimal server we control** (exact bodies, also for unknown routes); **one always-on instance** | *Framework defaults:* different 404/405 bodies. *Autoscaling:* each instance has its own state. |
 
 **Risks:** a rule outside our candidate family (add candidates, probe again) · budget runs out (cache, never repeat) · late drift (canary runs until 20:00).
