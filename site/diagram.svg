@@ -1,0 +1,131 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1020 580" font-family="ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, sans-serif" role="img" aria-labelledby="t d">
+  <title id="t">La caja negra: architecture</title>
+  <desc id="d">Discovery tools probe the original service and record traces; traces become the spec and the regression corpus; the deployed replica is a raw HTTP adapter over a pure decision core; a harness diffs the replica against the corpus and a canary watches the original for drift.</desc>
+  <style>
+    :root { --bg:#ffffff; --fg:#14161a; --muted:#5b6370; --line:#9aa3af; --box:#f4f6f9; --stroke:#c9d0da; --accent:#0b6bcb; --accentbg:#e8f1fb; --warn:#b35c00; --warnbg:#fdf1e4; }
+    @media (prefers-color-scheme: dark) {
+      :root { --bg:#0f1115; --fg:#e8eaee; --muted:#9aa3af; --line:#6b7380; --box:#181b21; --stroke:#2c313a; --accent:#6cb0ff; --accentbg:#13233a; --warn:#ffb15c; --warnbg:#2c1e0e; }
+    }
+    .bg { fill: var(--bg); }
+    .group { fill: none; stroke: var(--stroke); stroke-width: 1.5; stroke-dasharray: 6 5; }
+    .glabel { fill: var(--muted); font-size: 12px; font-weight: 700; letter-spacing: .08em; }
+    .box { fill: var(--box); stroke: var(--stroke); stroke-width: 1.2; }
+    .core { fill: var(--accentbg); stroke: var(--accent); stroke-width: 1.5; }
+    .ext { fill: var(--warnbg); stroke: var(--warn); stroke-width: 1.5; }
+    .h { fill: var(--fg); font-size: 14px; font-weight: 650; }
+    .s { fill: var(--muted); font-size: 12px; }
+    .mono { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; }
+    .edge { fill: none; stroke: var(--line); stroke-width: 1.5; }
+    .edge.hot { stroke: var(--accent); }
+    .elabel { fill: var(--muted); font-size: 11px; font-style: italic; }
+    .arrow { fill: var(--line); }
+    .arrow.hot { fill: var(--accent); }
+  </style>
+  <defs>
+    <marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="arrow" d="M0,0 L10,5 L0,10 z"/></marker>
+    <marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="arrow hot" d="M0,0 L10,5 L0,10 z"/></marker>
+  </defs>
+  <rect class="bg" width="1020" height="580"/>
+
+  <!-- External systems -->
+  <rect class="ext" x="390" y="18" width="220" height="62" rx="8"/>
+  <text class="h" x="500" y="44" text-anchor="middle">Original service</text>
+  <text class="s" x="500" y="63" text-anchor="middle">POST /msg · CMD;args;control</text>
+
+  <rect class="ext" x="700" y="18" width="270" height="62" rx="8"/>
+  <text class="h" x="835" y="44" text-anchor="middle">Evaluator · hidden test set</text>
+  <text class="s" x="835" y="63" text-anchor="middle">POST /__reset, then a sequence</text>
+
+  <!-- Discovery group -->
+  <rect class="group" x="20" y="118" width="430" height="262" rx="10"/>
+  <text class="glabel" x="36" y="374">DISCOVERY · LOCAL</text>
+
+  <rect class="box" x="40" y="155" width="180" height="56" rx="7"/>
+  <text class="h" x="130" y="179" text-anchor="middle">Probe</text>
+  <text class="s mono" x="130" y="198" text-anchor="middle">req.py · E1, E2, …</text>
+
+  <rect class="box" x="40" y="225" width="180" height="56" rx="7"/>
+  <text class="h" x="130" y="249" text-anchor="middle">Stateful fuzzer</text>
+  <text class="s" x="130" y="268" text-anchor="middle">random op sequences</text>
+
+  <rect class="box" x="40" y="305" width="180" height="56" rx="7"/>
+  <text class="h" x="130" y="329" text-anchor="middle">Shrinker</text>
+  <text class="s" x="130" y="348" text-anchor="middle">divergence → minimal case</text>
+
+  <rect class="box" x="250" y="155" width="180" height="56" rx="7"/>
+  <text class="h" x="340" y="179" text-anchor="middle">Trace store</text>
+  <text class="s mono" x="340" y="198" text-anchor="middle">traces/*.jsonl</text>
+
+  <rect class="box" x="250" y="305" width="180" height="56" rx="7"/>
+  <text class="h" x="340" y="329" text-anchor="middle">Spec + experiment log</text>
+  <text class="s" x="340" y="348" text-anchor="middle">each rule cites its traces</text>
+
+  <!-- Replica group -->
+  <rect class="group" x="550" y="118" width="440" height="262" rx="10"/>
+  <text class="glabel" x="566" y="374">REPLICA · DEPLOYED · ONE PROCESS</text>
+
+  <rect class="box" x="570" y="155" width="180" height="56" rx="7"/>
+  <text class="h" x="660" y="179" text-anchor="middle">Raw HTTP adapter</text>
+  <text class="s" x="660" y="198" text-anchor="middle">exact bodies, even unknown routes</text>
+
+  <rect class="box" x="570" y="230" width="180" height="56" rx="7"/>
+  <text class="h" x="660" y="254" text-anchor="middle">Serial queue</text>
+  <text class="s" x="660" y="273" text-anchor="middle">actor model · one at a time</text>
+
+  <rect class="box" x="570" y="305" width="180" height="56" rx="7"/>
+  <text class="h" x="660" y="329" text-anchor="middle">Service ontology</text>
+  <text class="s" x="660" y="348" text-anchor="middle">typed rules + evidence · v1, v2</text>
+
+  <rect class="core" x="780" y="155" width="190" height="131" rx="7"/>
+  <text class="h" x="875" y="178" text-anchor="middle">Decision core</text>
+  <text class="s mono" x="875" y="196" text-anchor="middle">handle(state[token], msg)</text>
+  <text class="s mono" x="875" y="211" text-anchor="middle">→ (state, resp)</text>
+  <text class="s" x="875" y="234" text-anchor="middle">route → auth → parse</text>
+  <text class="s" x="875" y="251" text-anchor="middle">→ control → cmd → arity</text>
+  <text class="s" x="875" y="268" text-anchor="middle">→ lookup → rule → effect</text>
+
+  <rect class="box" x="780" y="305" width="190" height="56" rx="7"/>
+  <text class="h" x="875" y="329" text-anchor="middle">In-memory state</text>
+  <text class="s mono" x="875" y="348" text-anchor="middle">/__reset · /health</text>
+
+  <!-- Harness group -->
+  <rect class="group" x="20" y="410" width="970" height="150" rx="10"/>
+  <text class="glabel" x="36" y="432">VERIFICATION HARNESS</text>
+
+  <rect class="box" x="40" y="450" width="380" height="88" rx="7"/>
+  <text class="h" x="230" y="476" text-anchor="middle">Eval stack (anti-Goodhart)</text>
+  <text class="s" x="230" y="497" text-anchor="middle">corpus = train · held-out fuzz = test (M1)</text>
+  <text class="s" x="230" y="516" text-anchor="middle">canary = eval still true? · hidden set = final test</text>
+
+  <rect class="core" x="570" y="450" width="180" height="88" rx="7"/>
+  <text class="h" x="660" y="476" text-anchor="middle">Differential diff</text>
+  <text class="s" x="660" y="497" text-anchor="middle">replay corpus vs replica</text>
+  <text class="s" x="660" y="516" text-anchor="middle">status · JSON body</text>
+
+  <rect class="core" x="780" y="450" width="190" height="88" rx="7"/>
+  <text class="h" x="875" y="476" text-anchor="middle">Drift canary</text>
+  <text class="s" x="875" y="497" text-anchor="middle">every 5 min vs original</text>
+  <text class="s" x="875" y="516" text-anchor="middle">diff → alert → re-probe</text>
+
+  <!-- Edges -->
+  <path class="edge" d="M130,155 V49 H388" marker-end="url(#a)"/>
+  <text class="elabel" x="140" y="42">recorded requests</text>
+  <path class="edge" d="M500,80 V100 H340 V153" marker-end="url(#a)"/>
+  <text class="elabel" x="350" y="96">responses</text>
+  <path class="edge" d="M130,211 V223" marker-end="url(#a)"/>
+  <path class="edge" d="M130,281 V303" marker-end="url(#a)"/>
+  <path class="edge" d="M220,253 H250 V213" marker-end="url(#a)"/>
+  <path class="edge" d="M340,211 V303" marker-end="url(#a)"/>
+  <path class="edge hot" d="M430,333 H568" marker-end="url(#ah)"/>
+  <text class="elabel" x="458" y="325">compiles into</text>
+  <path class="edge" d="M760,80 V104 H660 V153" marker-end="url(#a)"/>
+  <path class="edge" d="M660,211 V228" marker-end="url(#a)"/>
+  <path class="edge" d="M750,258 H778" marker-end="url(#a)"/>
+  <path class="edge" d="M750,322 L778,290" marker-end="url(#a)"/>
+  <path class="edge" d="M875,286 V303" marker-end="url(#a)"/>
+  <path class="edge" d="M430,183 H480 V494 H568" marker-end="url(#a)"/>
+  <text class="elabel" x="488" y="400">corpus</text>
+  <path class="edge hot" d="M660,450 V382" marker-end="url(#ah)"/>
+  <path class="edge" d="M568,515 H422" marker-end="url(#a)"/>
+  <path class="edge hot" d="M970,494 H1004 V92 H585 V82" marker-end="url(#ah)"/>
+</svg>
