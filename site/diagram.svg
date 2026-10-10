@@ -23,6 +23,7 @@
     .edge.hot { stroke: var(--accent); stroke-width: 2; }
     .elabel { fill: var(--muted); font-size: 11px; font-style: italic; }
     .cap { fill: var(--muted); font-size: 13px; }
+    .klabel { fill: var(--accent); font-size: 10px; font-weight: 700; letter-spacing: .1em; }
     .capb { fill: var(--fg); font-weight: 700; }
     .arrow { fill: var(--line); }
     .arrow.hot { fill: var(--accent); }
@@ -74,11 +75,15 @@
   <!-- Ontology: the bridge between System 2 and System 1 -->
   <text class="glabel" x="593" y="146" text-anchor="middle">SHARED MEMORY</text>
   <rect class="onto" x="478" y="155" width="230" height="206" rx="9"/>
-  <text class="hl" x="593" y="222" text-anchor="middle">Service ontology</text>
-  <text class="em" x="593" y="246" text-anchor="middle">versioned model of the black box</text>
-  <text class="s" x="593" y="272" text-anchor="middle">proven rules with evidence</text>
-  <text class="s" x="593" y="291" text-anchor="middle">a new version per service change</text>
-  <text class="s" x="593" y="318" text-anchor="middle">generates SPEC.md and tests</text>
+  <text class="hl" x="593" y="180" text-anchor="middle">Service ontology</text>
+  <text class="em" x="593" y="199" text-anchor="middle">versioned model of the black box</text>
+  <text class="klabel" x="593" y="226" text-anchor="middle">HOLDS</text>
+  <text class="s" x="593" y="243" text-anchor="middle">operations · fields · state</text>
+  <text class="s" x="593" y="260" text-anchor="middle">rules · errors · evidence</text>
+  <text class="klabel" x="593" y="287" text-anchor="middle">USED TO</text>
+  <text class="s" x="593" y="304" text-anchor="middle">run the replica · write SPEC.md</text>
+  <text class="s" x="593" y="321" text-anchor="middle">build tests · find gaps</text>
+  <text class="s" x="593" y="338" text-anchor="middle">compare versions</text>
 
   <!-- System 1 group -->
   <rect class="group" x="760" y="118" width="460" height="262" rx="10"/>
