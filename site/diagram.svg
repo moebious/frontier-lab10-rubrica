@@ -61,7 +61,7 @@
 
   <rect class="box" x="250" y="155" width="180" height="56" rx="7"/>
   <text class="h" x="340" y="179" text-anchor="middle">Experiment log</text>
-  <text class="s mono" x="340" y="198" text-anchor="middle">experimentos.jsonl</text>
+  <text class="s" x="340" y="198" text-anchor="middle">every request + hypothesis</text>
 
   <rect class="box" x="250" y="230" width="180" height="56" rx="7"/>
   <text class="h" x="340" y="254" text-anchor="middle">Person + model</text>
@@ -74,9 +74,11 @@
   <!-- Ontology: the bridge between System 2 and System 1 -->
   <text class="glabel" x="593" y="146" text-anchor="middle">SHARED MEMORY</text>
   <rect class="onto" x="478" y="155" width="230" height="206" rx="9"/>
-  <text class="hl" x="593" y="240" text-anchor="middle">Service ontology</text>
-  <text class="s" x="593" y="262" text-anchor="middle">proven rules with evidence</text>
-  <text class="s" x="593" y="292" text-anchor="middle">generates SPEC.md and tests</text>
+  <text class="hl" x="593" y="222" text-anchor="middle">Service ontology</text>
+  <text class="em" x="593" y="246" text-anchor="middle">versioned model of the black box</text>
+  <text class="s" x="593" y="272" text-anchor="middle">proven rules with evidence</text>
+  <text class="s" x="593" y="291" text-anchor="middle">a new version per service change</text>
+  <text class="s" x="593" y="318" text-anchor="middle">generates SPEC.md and tests</text>
 
   <!-- System 1 group -->
   <rect class="group" x="760" y="118" width="460" height="262" rx="10"/>
@@ -92,7 +94,7 @@
 
   <rect class="box" x="780" y="305" width="200" height="56" rx="7"/>
   <text class="h" x="880" y="329" text-anchor="middle">Compiled rule table</text>
-  <text class="s" x="880" y="348" text-anchor="middle">no LLM at runtime</text>
+  <text class="s" x="880" y="348" text-anchor="middle">from the current version</text>
 
   <rect class="core" x="1005" y="155" width="195" height="131" rx="7"/>
   <text class="h" x="1102" y="202" text-anchor="middle">Decision core</text>
@@ -108,8 +110,8 @@
   <text class="glabel" x="36" y="432">VERIFICATION HARNESS</text>
 
   <rect class="box" x="40" y="450" width="380" height="88" rx="7"/>
-  <text class="h" x="230" y="476" text-anchor="middle">Metrics</text>
-  <text class="s" x="230" y="497" text-anchor="middle">exact-match rate on recorded and held-out tests</text>
+  <text class="h" x="230" y="476" text-anchor="middle">Results</text>
+  <text class="s" x="230" y="497" text-anchor="middle">exact-match rate · detected changes</text>
   <text class="s" x="230" y="516" text-anchor="middle">held-out tests are never used to fix code</text>
 
   <rect class="core" x="780" y="450" width="200" height="88" rx="7"/>
@@ -135,7 +137,7 @@
   <path class="edge hot" d="M430,333 H476" marker-end="url(#ah)"/>
   <path class="edge" d="M130,286 V303" marker-end="url(#a)"/>
   <path class="edge" d="M340,450 V363" marker-end="url(#a)"/>
-  <text class="elabel" x="348" y="402">failing cases</text>
+  <text class="elabel" x="348" y="402">reopen rules</text>
 
   <!-- Edges: ontology to System 1 and to the harness -->
   <path class="edge hot" d="M593,361 V395 H830 V363" marker-end="url(#ah)"/>
@@ -154,9 +156,11 @@
   <path class="edge hot" d="M900,450 V382" marker-end="url(#ah)"/>
   <text class="elabel" x="908" y="424">via HTTP</text>
   <path class="edge" d="M778,515 H422" marker-end="url(#a)"/>
+  <path class="edge hot" d="M1102,538 V553 H230 V540" marker-end="url(#ah)"/>
+  <text class="elabel" x="600" y="548">changes</text>
   <path class="edge hot" d="M1200,494 H1232 V4 H650 V10" marker-end="url(#ah)"/>
 
   <!-- Caption -->
-  <text class="cap" x="620" y="586" text-anchor="middle"><tspan class="capb">Rubrica</tspan> · System 2 discovers → the ontology remembers → System 1 executes · the original service is the exact judge</text>
+  <text class="cap" x="620" y="586" text-anchor="middle"><tspan class="capb">Rubrica</tspan> maintains a model of the black box, not a fixed copy: System 2 learns it · the ontology versions it · System 1 runs the current version</text>
   </g>
 </svg>
