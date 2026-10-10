@@ -3,7 +3,7 @@
 
 [Learning a black box, one proven rule at a time]{.subtitle}
 
-[Reto 2 · La caja negra · rubrica.dev · Kevin Vicent · v17 · For the judges and any engineer who rebuilds the replica]{.meta}
+[Reto 2 · La caja negra · rubrica.dev · Kevin Vicent · v18 · For the judges and any engineer who rebuilds the replica]{.meta}
 
 [The black box is an unknown decision procedure. We find its rules with experiments. We prove each rule against the real service. Then we compile the rules into a deterministic replica. Most agent systems need an LLM judge. Ours has an exact judge for every behavior it probes: the original service. What it never probes is the open risk, so we measure it.]{.thesis}
 :::
@@ -38,13 +38,12 @@ An undocumented service receives text messages on `POST /msg` (body `{"m": "…"
 
 We use Kahneman's terms. **System 2** is slow and deliberate: the offline loop that discovers the rules. **System 1** is fast and automatic: the deployed replica that applies them.
 
-1. **Agent harness (System 2, offline).** A *harness* is the code around a model that gives it tools, memory and limits. A person and a reasoning model use only recorded tools (`probe`, `sequence`, `fuzz`, `diff`, `shrink`: minimize a failing sequence); each request is logged with its hypothesis. **No request without a prediction:** a code gate blocks requests with no prediction, already answered by the log, or over budget.
-2. **Hypothesis search, not answer search.** Blind sweeps waste budget (our first cost 543 requests). Each candidate rule predicts an answer; we send the request that splits the candidates most evenly, so cost grows with the logarithm of their number. **Target: < 50 probes per unknown rule;** with no survivor, the rule becomes *supuesto* (a documented default).
-3. **Service ontology (memory).**
+1. **Agent harness (System 2, offline).** A *harness* is the code around a model that gives it tools, memory and limits. A person and a reasoning model use only recorded tools (`probe`, `sequence`, `fuzz`, `diff`, `shrink`: minimize a failing sequence); each request is logged with its hypothesis. **No request without a prediction:** a code gate blocks requests with no prediction, already answered by the log, or over budget. When several candidate rules fit the evidence, the harness sends the request that best separates them; an unknown rule gets at most 50 probes, then becomes a documented default (*supuesto*).
+2. **Service ontology (memory).**
     - **What it is:** an explicit model of a domain: its concepts and the relations between them. Ours models the black box.
     - **What it holds:** operations, fields, state, rules, errors and evidence. A rule applies to an operation, needs preconditions, returns a response, changes state, outranks other rules and is proven by log lines. Its confidence uses the README's levels: *confirmado* (proven, repeated), *probable* (seen once or inferred), *supuesto* (untested default).
     - **What we use it for:** run the replica, generate `SPEC.md`, build tests from evidence, choose the next probes from its gaps, and **compare versions: most changes are new data; a new operation is one more rule.**
-4. **Replica (System 1, runtime).** HTTP adapter → serial queue (one request at a time, so state changes in a fixed order, as in the original) → decision core. Compiling sorts the rules by learned precedence and indexes them by operation; **the first matching rule decides.** State is in memory, one state per token.
+3. **Replica (System 1, runtime).** HTTP adapter → serial queue (one request at a time, so state changes in a fixed order, as in the original) → decision core. Compiling sorts the rules by learned precedence and indexes them by operation; **the first matching rule decides.** State is in memory, one state per token.
 
 | Decision | Chosen | Rejected, and why |
 |---|--------|----------|
