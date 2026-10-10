@@ -1,0 +1,40 @@
+#!/bin/sh
+# Block commits that contain Frontier tokens or .env files.
+# Enable once per clone: git config core.hooksPath .githooks
+set -u
+fail=0
+
+# 1. Never commit .env files (.env.example is allowed).
+for f in $(git diff --cached --name-only --diff-filter=ACMR); do
+  case "$f" in
+    .env.example|*/.env.example) ;;
+    .env|.env.*|*/.env|*/.env.*)
+      echo "pre-commit: refusing to commit $f (secrets file)."
+      fail=1 ;;
+  esac
+done
+
+added=$(git diff --cached -U0 --diff-filter=ACMR | grep '^+' | grep -v '^+++' || true)
+
+# 2. No token-shaped strings (participant and team tokens look like cn-x-…).
+if printf '%s\n' "$added" | grep -Eq 'cn-[a-z]-[A-Za-z0-9_]+-[A-Za-z0-9_-]{6,}'; then
+  echo "pre-commit: a staged change contains a Frontier token (cn-…)."
+  fail=1
+fi
+
+# 3. No literal token values copied from .env.
+if [ -f .env ]; then
+  for v in $(sed -n 's/^[A-Z_]*TOKEN=//p' .env); do
+    [ -n "$v" ] || continue
+    if printf '%s\n' "$added" | grep -qF -- "$v"; then
+      echo "pre-commit: a staged change contains a token value from .env."
+      fail=1
+    fi
+  done
+fi
+
+if [ "$fail" -ne 0 ]; then
+  echo "Commit blocked. Remove the secret, then commit again."
+  exit 1
+fi
+exit 0
